@@ -8,6 +8,12 @@ class GamesController < ApplicationController
     render json: { commitment: commitment }, status: :ok
   end
 
+  def index
+    @games = Game.order(created_at: :desc).limit(5)
+    render json: @games, status: :ok
+  end
+
+
   def create
     game = Game.new(game_params)
 
@@ -17,9 +23,14 @@ class GamesController < ApplicationController
     # Retrieve the server's secret for this game
     server_secret = session[:server_secret]
 
+    streak = winning_streak(game.user_address)
+
+    # Adjust odds based on winning streak
+    win_chance = streak >= 3 ? 5 : 45 # 5% chance if they've won 3 in a row, otherwise 45%
+
     # Generate the outcome using the server's secret
     srand(server_secret.hash)
-    coin_flip = rand(2) == 1
+    coin_flip = rand(100) < win_chance
     game.outcome = coin_flip
 
     # Calculate payout based on the outcome and house edge
@@ -40,6 +51,8 @@ class GamesController < ApplicationController
 
   private
 
+
+
   def set_server_secret
     session[:server_secret] ||= SecureRandom.hex(16)
   end
@@ -48,4 +61,11 @@ class GamesController < ApplicationController
     params.require(:game).permit(:user_address, :bet_amount, :choice)
   end
 
+  def winning_streak(user_address)
+    # Get the last 3 games for the user
+    last_games = Game.where(user_address: user_address).order(created_at: :desc).limit(3)
+
+    # Count how many of those games were wins
+    last_games.count { |game| game.outcome }
+  end
 end
