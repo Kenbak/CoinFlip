@@ -11,6 +11,9 @@ class GamesController < ApplicationController
   def create
     game = Game.new(game_params)
 
+     # Simulate sending 0.01 ETH to the contract
+     logger.info "Received 0.01 ETH from #{game.user_address}"
+
     # Retrieve the server's secret for this game
     server_secret = session[:server_secret]
 
@@ -27,6 +30,8 @@ class GamesController < ApplicationController
     end
 
     if game.save
+        # Simulate payout if user wins
+        logger.info "Sent #{game.payout} ETH to #{game.user_address}" if game.outcome
       render json: game, status: :created
     else
       render json: game.errors, status: :unprocessable_entity

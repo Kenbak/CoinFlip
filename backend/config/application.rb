@@ -10,8 +10,10 @@ module Backend
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
+    config.middleware.use ActionDispatch::Session::ActiveRecordStore
+    config.session_store :active_record_store, key: 'zk_coinflip'
 
-    config.middleware.use ActionDispatch::Session::CookieStore
+
 
 
     # Configuration for the application, engines, and railties goes here.
