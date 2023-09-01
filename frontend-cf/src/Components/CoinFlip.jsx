@@ -4,9 +4,12 @@ import "../Style/Components/Coinflip.scss";
 import logo from '../assets/images/zkflogo.png'
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect  } from 'wagmi'
+import { ethers } from "ethers";
+import { checkNetwork, placeBet, payoutWinner, getCurrentBet, getContractBalance } from "../Contract/BetFunction";
 
 
-function CoinFlip({ userAddress, setUserAddress }) {
+
+function CoinFlip() {
 
   const [betAmount, setBetAmount] = useState(null);
   const [result, setResult] = useState(null);
@@ -65,10 +68,7 @@ function CoinFlip({ userAddress, setUserAddress }) {
     resetGame();
   };
 
-  const handleClaimRewards = () => {
-    console.log(`Sent ${result.payout} ETH to ${userAddress}`);
-    resetGame();
-  };
+
 
 
   const handleSubmit = async (e) => {
@@ -82,27 +82,33 @@ function CoinFlip({ userAddress, setUserAddress }) {
     try {
       setLoading(true);
       setLoadingStage('confirmation');
-      // Simulate a delay for blockchain confirmation
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds delay for confirmation
+       // First, check if user is connected to the correct network
+       await checkNetwork();
+       // Place the bet on the Ethereum blockchain
+       await placeBet();
 
       setLoadingStage('flipping');
       // Introduce another delay for the flipping animation
       await new Promise(resolve => setTimeout(resolve, 3000));
+
+       // Get the result from the server (This assumes your backend server is still validating the game result)
       const response = await axios.post('http://localhost:3000/games', {
-        user_address: userAddress,
+        user_address: address,
         bet_amount: betAmount,
         choice: selectedOption
       });
 
       setResult(response.data);
       setLoading(false);
-      // Inside handleSubmit after receiving the response
-
 
       setLoadingStage(null);
       const updatedHistory = await axios.get('http://localhost:3000/games');
       setGameHistory(updatedHistory.data);
 
+      if (response.data.outcome) {
+        // If the user won, trigger the payout
+        await payoutWinner(address);
+      }
     } catch (error) {
       setLoading(false);
       setLoadingStage(null);
@@ -151,7 +157,7 @@ function CoinFlip({ userAddress, setUserAddress }) {
           <form onSubmit={handleSubmit}>
             {/* <label>
               Ethereum Address:
-              {userAddress}
+              {address}
             </label> */}
             <div className='game-infos'>
 
@@ -208,7 +214,7 @@ function CoinFlip({ userAddress, setUserAddress }) {
               <div>
                 <p className='mb-0'>YOU WON</p>
                 <p className='win'>{(betAmount / 1e18).toFixed(2)} ETH</p>
-                <button className='game-button' onClick={handleClaimRewards}>Claim rewards</button>
+                <button className='game-button' onClick={handleTryAgain}>TRY AGAIN</button>
               </div>
             ) : (
               <div>

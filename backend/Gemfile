@@ -19,6 +19,8 @@ gem 'rack-cors'
 
 gem 'activerecord-session_store'
 
+gem 'ethereum.rb'
+
 
 
 # Use Redis adapter to run Action Cable in production

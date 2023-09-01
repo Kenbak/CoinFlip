@@ -1,6 +1,6 @@
 // for testnet
 
-export const VITE_HUE1_ADDRESS = "0xb3262c398Daa8cB569759e06Eea1511f5f6ae370"
+export const VITE_COINFLIP_ADDRESS = "0xC112C444A5d75A1eA09e6e776b4cce0936A655Da"
 
 
 export const VITE_RPC_URL="https://zksync2-testnet.zksync.dev"
@@ -14,7 +14,7 @@ export const ALCHEMY_ID = "SGZRXaj2JYspAeKmgkhiPpyRHeC_muhA"
 
 // // for mainnet
 
-// export const VITE_HUE1_ADDRESS = ""
+// export const VITE_COINFLIP_ADDRESS = ""
 
 
 // export const VITE_RPC_URL= import.meta.env.VITE_RPC_URL || "https://zksync2-mainnet.zksync.io"
