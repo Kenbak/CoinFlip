@@ -1,0 +1,36 @@
+@import 'colors';
+@import 'buttons';
+
+.App {
+  text-align: center;
+}
+
+body.light {
+  background-color: #ffffff;
+  color: #333333;
+}
+
+body.dark {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+
+.App-header {
+  background-color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  font-size: calc(10px + 2vmin);
+  color: $text;
+  font-family: 'Bree Serif', serif;
+
+}
+
+.App-link {
+  color: #61dafb;
+}

@@ -1,0 +1,140 @@
+@import '../_colors.scss';
+@import '../_buttons.scss';
+
+.title {
+  font-size: 5rem;
+  margin: 0px;
+  background: linear-gradient(90deg, #8C8DFC 0%, #4E5299 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header{
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  justify-content: center;
+
+  #logo{
+    margin-top: 15px;
+  }
+
+}
+
+.mb-0{
+  margin-bottom: 0px;
+}
+
+
+.win{
+  margin-top: 0px;
+  color: green;
+}
+
+.lose{
+  margin-top: 0px;
+  color: red;
+}
+
+.tagline{
+  margin-top: 0px;
+}
+
+@keyframes flip {
+  0% {
+    transform: perspective(600px) rotateX(0deg);
+  }
+
+  100% {
+    transform: perspective(600px) rotateX(360deg);
+  }
+}
+
+#flip-logo {
+  animation: flip 1.5s cubic-bezier(0.42, 0, 0.58, 1) infinite; // 3s is the duration of one flip. Adjust as needed.
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+
+
+.game-infos{
+  display: flex;
+  gap: 30px;
+  flex-direction: column;
+  border: 3px solid #4D5297;
+  border-radius: 10px;
+  /* padding: 20px 40px; */
+  align-items: center;
+  height: 450px;
+  width: 350px;
+  overflow: auto;
+  justify-content: center;
+}
+
+.m-0{
+  margin: 0px;
+}
+
+.loading-stage {
+  gap: 0;
+}
+
+
+.options{
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.inputs{
+  display: flex;
+  gap: 40px;
+
+}
+
+
+
+.option {
+  display: inline-block;
+  padding: 5px 20px;
+  border-radius: 30px;
+  background-color: $text-light;
+  border: 2px solid $text;
+  color: white;
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-family: 'Bree Serif', serif;
+
+  &:hover {
+    background-color: darken($color: $text-light, $amount: 10); // A slightly different shade of purple for hover effect
+  }
+
+  &.selected {
+    background-color: darken($color: $text-light, $amount: 15); // A darker shade of purple to indicate selection
+  }
+}
+
+.history-list{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  list-style: none;
+  gap: 5px;
+  font-size: 1rem;
+}
+
+.container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.bet-option {
+  width: auto; // This will make sure the button only takes the space it needs
+  padding: 5px 10px; // Adjust padding as needed
+}

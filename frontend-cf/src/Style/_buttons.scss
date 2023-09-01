@@ -1,0 +1,16 @@
+.game-button{
+  background-color: $yellow;
+  color: $orange;
+  border: none;
+  padding: 10px 10px;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Bree Serif', serif;
+  text-shadow: 1px 1px (beige);
+
+  &:hover {
+    background-color: darken($color: $yellow, $amount: 10); // A slightly different shade of purple for hover effect
+  }
+}
