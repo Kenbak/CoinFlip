@@ -19,7 +19,9 @@ gem 'rack-cors'
 
 gem 'activerecord-session_store'
 
-gem 'ethereum.rb'
+gem 'eth'
+
+gem 'dotenv-rails'
 
 
 

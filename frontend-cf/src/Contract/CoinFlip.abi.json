@@ -80,6 +80,36 @@
     "signature": "0x3f9326af"
   },
   {
+    "inputs": [],
+    "name": "MAX_WITHDRAWAL",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true,
+    "signature": "0x97ec642c"
+  },
+  {
+    "inputs": [],
+    "name": "WITHDRAWAL_COOLDOWN",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true,
+    "signature": "0xfeedab00"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -91,8 +121,18 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "amount",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "blockNumber",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum CoinFlip.Choice",
+        "name": "choice",
+        "type": "uint8"
       }
     ],
     "stateMutability": "view",
@@ -126,6 +166,21 @@
   },
   {
     "inputs": [],
+    "name": "lastWithdrawal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true,
+    "signature": "0x1dd300ce"
+  },
+  {
+    "inputs": [],
     "name": "owner",
     "outputs": [
       {
@@ -142,25 +197,25 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "winner",
-        "type": "address"
+        "internalType": "enum CoinFlip.Choice",
+        "name": "_choice",
+        "type": "uint8"
       }
     ],
-    "name": "payoutWinner",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x3f986e6a"
-  },
-  {
-    "inputs": [],
     "name": "placeBet",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function",
     "payable": true,
-    "signature": "0xf90f4560"
+    "signature": "0x43046844"
+  },
+  {
+    "inputs": [],
+    "name": "resolveBet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x8fced626"
   },
   {
     "inputs": [
@@ -176,4 +231,4 @@
     "type": "function",
     "signature": "0x155dd5ee"
   }
-]
+] 

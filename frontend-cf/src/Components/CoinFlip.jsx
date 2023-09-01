@@ -5,7 +5,7 @@ import logo from '../assets/images/zkflogo.png'
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect  } from 'wagmi'
 import { ethers } from "ethers";
-import { checkNetwork, placeBet, payoutWinner, getCurrentBet, getContractBalance } from "../Contract/BetFunction";
+import { checkNetwork, placeBet, resolveBet, getCurrentBet, getContractBalance } from "../Contract/BetFunction";
 
 
 
@@ -34,6 +34,8 @@ function CoinFlip() {
 
 
 
+const MAX_RETRIES = 5; // Maximum number of retries
+const RETRY_INTERVAL = 15000; // Retry every 5 seconds
 
 
   const [selectedBet, setSelectedBet] = useState(null);
@@ -44,15 +46,26 @@ function CoinFlip() {
     } else {
       setSelectedOption(value);
     }
+};
 
-  };
+useEffect(() => {
+  if (!isConnected) {
+      resetGame();
+  }
+}, [isConnected]);
+
+
+
 
   const resetGame = () => {
     setBetAmount(null);
-  setSelectedOption(null);
-  setSelectedBet(null); // Reset the selected bet amount
-  setResult(null);
-  };
+    setSelectedOption(null);
+    setSelectedBet(null);
+    setResult(null);
+    setLoading(false);
+    setLoadingStage(null);
+};
+
 
   const selectBetAmount = () => {
     if (selectedBet === 0.01e18) {
@@ -74,7 +87,7 @@ function CoinFlip() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedOption || !betAmount) {
+    if (selectedOption === null || betAmount === null) {
       alert("Please select the bet amount and choose Heads or Tails!");
       return;
     }
@@ -85,40 +98,70 @@ function CoinFlip() {
        // First, check if user is connected to the correct network
        await checkNetwork();
        // Place the bet on the Ethereum blockchain
-       await placeBet();
+       await placeBet(selectedOption)
 
       setLoadingStage('flipping');
       // Introduce another delay for the flipping animation
       await new Promise(resolve => setTimeout(resolve, 3000));
 
        // Get the result from the server (This assumes your backend server is still validating the game result)
-      const response = await axios.post('http://localhost:3000/games', {
-        user_address: address,
-        bet_amount: betAmount,
-        choice: selectedOption
-      });
+       let retries = 0;
+       let resolved = false;
+       let outcome; // Declare outside the loop
 
-      setResult(response.data);
-      setLoading(false);
+       while (retries < MAX_RETRIES && !resolved) {
+         try {
+          outcome = await resolveBet()
+           resolved = true;
+         } catch (error) {
+           retries++;
+           if (retries < MAX_RETRIES) {
+             await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL));
+           }
+         }
+       }
 
-      setLoadingStage(null);
-      const updatedHistory = await axios.get('http://localhost:3000/games');
-      setGameHistory(updatedHistory.data);
+       if (!resolved) {
+         throw new Error("Failed to resolve bet after multiple attempts.");
+       }
 
-      if (response.data.outcome) {
-        // If the user won, trigger the payout
-        await payoutWinner(address);
+       const choiceString = selectedOption === 0 ? "heads" : "tails";
+
+
+
+        // Store the game data in the backend
+        await axios.post('http://localhost:3000/games', {
+          user_address: address,
+          bet_amount: betAmount,
+          choice: choiceString,
+          outcome: outcome // Assuming result is a boolean indicating win/loss
+        });
+
+        setResult({ outcome: outcome }); // Update the result based on the response
+        setLoading(false);
+        setLoadingStage(null);
+
+        console.log(result)
+        console.log(outcome)
+
+        const updatedHistory = await axios.get('http://localhost:3000/games');
+        setGameHistory(updatedHistory.data);
+
+      } catch (error) {
+        setLoading(false);
+        setLoadingStage(null);
+        if (error.response && error.response.data) {
+          console.error("Error:", error.response.data);
+        } else {
+          console.error("Error:", error.message);
+        }
       }
-    } catch (error) {
-      setLoading(false);
-      setLoadingStage(null);
-      if (error.response && error.response.data) {
-        console.error("Error:", error.response.data);
-      } else {
-        console.error("Error:", error.message);
-      }
-    }
-  };
+    };
+
+    const getChoiceString = (option) => {
+      return option === 0 ? "Heads" : "Tails";
+    };
+
 
 
   return (
@@ -144,7 +187,7 @@ function CoinFlip() {
           <ul className='history-list'>
               {gameHistory.map((game, index) => (
                   <li key={index}>
-                        {game.user_address} called {game.choice} with {(game.bet_amount/ 1e18).toFixed(2)} ETH on and {game.outcome ? <span className='win'>doubled up! 💰</span>: <span className='lose'>slipped away! 😏</span>}
+                        {game.user_address} called {game.choice} with {(game.bet_amount/ 1e18).toFixed(2)} ETH and {game.outcome ? <span className='win'>doubled up! 💰</span>: <span className='lose'>slipped away! 😏</span>}
                   </li>
               ))}
           </ul>
@@ -164,18 +207,18 @@ function CoinFlip() {
               <div className='options'>
                 <label>I PICK...</label>
                 <div className='inputs'>
-                  <div
-                  className={`option ${selectedOption === "heads" ? "selected" : ""}`}
-                  onClick={() => handleOptionChange("heads")}
-                  >
+                <div
+                  className={`option ${selectedOption === 0 ? "selected" : ""}`}
+                  onClick={() => handleOptionChange(0)} // 0 for Heads
+                >
                   Heads
-                  </div>
-                  <div
-                  className={`option ${selectedOption === "tails" ? "selected" : ""}`}
-                  onClick={() => handleOptionChange("tails")}
-                  >
+                </div>
+                <div
+                  className={`option ${selectedOption === 1 ? "selected" : ""}`}
+                  onClick={() => handleOptionChange(1)} // 1 for Tails
+                >
                   Tails
-                  </div>
+                </div>
                 </div>
               </div>
 
@@ -195,7 +238,7 @@ function CoinFlip() {
             {loadingStage === 'confirmation' && (
               <div className='loading-stage'>
                 <p className='mb-0 uppercase'>Waiting for Confirmation...</p>
-                <p className='m-0 uppercase'>{selectedOption} FOR {(betAmount / 1e18).toFixed(2)} ETH</p>
+                <p className='m-0 uppercase'>{getChoiceString(selectedOption)} FOR {(betAmount / 1e18).toFixed(2)} ETH</p>
               </div>
             )}
 

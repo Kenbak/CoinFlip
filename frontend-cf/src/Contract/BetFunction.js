@@ -9,17 +9,26 @@ export async function checkNetwork() {
   }
 }
 
-export async function placeBet() {
+export async function placeBet(choice) { // Added choice parameter
     const contract = await getContractToWrite(VITE_COINFLIP_ADDRESS, CoinFlipABI);
-    const tx = await contract.placeBet({ value: ethers.utils.parseEther("0.01") }); // 0.01 ether
+    const tx = await contract.placeBet(choice, { value: ethers.utils.parseEther("0.01") }); // 0.01 ether
     await tx.wait();
 }
 
-export async function payoutWinner(winnerAddress) {
-    const contract = await getContractToWrite(VITE_COINFLIP_ADDRESS, CoinFlipABI);
-    const tx = await contract.payoutWinner(winnerAddress);
-    await tx.wait();
+export async function resolveBet() {
+  const contract = await getContractToWrite(VITE_COINFLIP_ADDRESS, CoinFlipABI);
+  const tx = await contract.resolveBet();
+  const receipt = await tx.wait();
+
+  // Check for the PayoutSent event in the transaction receipt
+  const payoutEventTopic = contract.interface.getEventTopic("PayoutSent");
+  const payoutEvent = receipt.logs.find(log => log.topics.includes(payoutEventTopic));
+
+  const outcome = !!payoutEvent; // outcome will be true if the event exists, false otherwise
+
+  return outcome;
 }
+
 
 export async function getCurrentBet(userAddress) {
     const contract = await getContractToRead(VITE_COINFLIP_ADDRESS, CoinFlipABI);
