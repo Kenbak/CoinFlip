@@ -15,10 +15,10 @@
 #   end
 # end
 # config/initializers/cors.rb
-
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins 'http://localhost:5173' # or any other origins you want to allow
+    # Use the appropriate URL based on the current environment
+    origins Rails.env.development? ? ENV['DEVELOPMENT_URL'] : ENV['PRODUCTION_URL']
 
     resource '*',
       headers: :any,

@@ -21,7 +21,8 @@ gem 'activerecord-session_store'
 
 gem 'eth'
 
-gem 'dotenv-rails'
+gem 'dotenv-rails', groups: [:development, :test]
+
 
 
 

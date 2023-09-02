@@ -6,6 +6,13 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect  } from 'wagmi'
 import { ethers } from "ethers";
 import { checkNetwork, placeBet, resolveBet, getCurrentBet, getContractBalance, isUserWhitelisted } from "../Contract/BetFunction";
+import Confetti from 'react-confetti';
+
+
+
+const BASE_API_URL = import.meta.env.DEV
+  ? import.meta.env.VITE_REACT_APP_DEVELOPMENT_URL
+  : import.meta.env.VITE_REACT_APP_PRODUCTION_URL;
 
 
 
@@ -20,6 +27,14 @@ function CoinFlip() {
   const { address, isConnected } = useAccount()
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [showGameHistory, setShowGameHistory] = useState(true);
+  const [showFunFact, setShowFunFact] = useState(false);
+  const [lastFactIndex, setLastFactIndex] = useState(null);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+
+
+
+
 
 
 
@@ -39,7 +54,7 @@ function CoinFlip() {
   useEffect(() => {
     const fetchGameHistory = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/games'); // Assuming the index action is at this endpoint
+            const response = await axios.get(`${BASE_API_URL}`); // Assuming the index action is at this endpoint
             setGameHistory(response.data);
         } catch (error) {
             console.error("Error fetching game history:", error);
@@ -108,88 +123,125 @@ useEffect(() => {
     setShowGameHistory(false);
 
     if (selectedOption === null || betAmount === null) {
-      alert("Please select the bet amount and choose Heads or Tails!");
-      return;
+        alert("Please select the bet amount and choose Heads or Tails!");
+        return;
     }
 
     try {
-      setLoading(true);
-      setLoadingStage('confirmation');
-       // First, check if user is connected to the correct network
-       await checkNetwork();
-        // Check if the user is whitelisted
+        setLoading(true);
+        setLoadingStage('confirmation');
+        await checkNetwork();
         const userIsWhitelisted = await isUserWhitelisted(address);
-
-        // Place the bet on the Ethereum blockchain
         await placeBet(selectedOption, userIsWhitelisted);
 
-      setLoadingStage('flipping');
-      // Introduce another delay for the flipping animation
-      await new Promise(resolve => setTimeout(resolve, 3000));
+        setLoadingStage('flipping');
+        await new Promise(resolve => setTimeout(resolve, 7000));
 
-       // Get the result from the server (This assumes your backend server is still validating the game result)
-       let retries = 0;
-       let resolved = false;
-       let outcome; // Declare outside the loop
+        let retries = 0;
+        let resolved = false;
+        let outcome;
 
-       while (retries < MAX_RETRIES && !resolved) {
-         try {
-          outcome = await resolveBet()
-           resolved = true;
-         } catch (error) {
-           retries++;
-           if (retries < MAX_RETRIES) {
-             await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL));
-           }
-         }
-       }
+        while (retries < MAX_RETRIES && !resolved) {
+          try {
+              outcome = await resolveBet();
+              resolved = true;
+          } catch (error) {
+              retries++;
+              if (retries === 1) {
+                  setLoadingStage('flipping');
+                  // Add the fun fact here
+                  setShowFunFact(true);
+              } else if (retries === 2) {
+                  setLoadingStage('retrying');
+              } else if (retries === 3) {
+                  setLoadingStage('almostThere');
+              } else if (retries === 4) {
+                  setLoadingStage('finalizing');
+              }
+              if (retries < MAX_RETRIES) {
+                  await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL));
+              }
+          }
+      }
 
-       if (!resolved) {
-         throw new Error("Failed to resolve bet after multiple attempts.");
-       }
+        if (!resolved) {
+            throw new Error("Failed to resolve bet after multiple attempts.");
+        }
 
-       const choiceString = selectedOption === 0 ? "heads" : "tails";
-
-
-
-        // Store the game data in the backend
-        await axios.post('http://localhost:3000/games', {
-          user_address: address,
-          bet_amount: betAmount,
-          choice: choiceString,
-          outcome: outcome // Assuming result is a boolean indicating win/loss
+        const choiceString = selectedOption === 0 ? "heads" : "tails";
+        await axios.post(`${BASE_API_URL}`, {
+            user_address: address,
+            bet_amount: betAmount,
+            choice: choiceString,
+            outcome: outcome
         });
 
-        setResult({ outcome: outcome }); // Update the result based on the response
+        setResult({ outcome: outcome });
         setLoading(false);
         setLoadingStage(null);
 
-        console.log(result)
-        console.log(outcome)
-
-        const updatedHistory = await axios.get('http://localhost:3000/games');
+        const updatedHistory = await axios.get(`${BASE_API_URL}`);
         setGameHistory(updatedHistory.data);
 
-      } catch (error) {
+    } catch (error) {
         setLoading(false);
         setLoadingStage(null);
         if (error.response && error.response.data) {
-          console.error("Error:", error.response.data);
+            console.error("Error:", error.response.data);
         } else {
-          console.error("Error:", error.message);
+            console.error("Error:", error.message);
         }
-      }
-    };
+    }
+};
 
     const getChoiceString = (option) => {
       return option === 0 ? "Heads" : "Tails";
     };
 
+    const coinFacts = [
+      "The study of coins is called 'numismatics.'",
+      "The first coins were made in 600 B.C. in Lydia, modern-day Turkey.",
+      "The ridges on the edges of coins are called 'reeding.'",
+      "The U.S. Mint produces over 13 billion coins annually.",
+      "The 'heads' side of a coin is technically called the 'obverse.'",
+      "The world's largest coin weighs over 2,200 pounds and is made of pure gold!",
+      "Coins have been used as a form of currency for over 2,600 years.",
+      "The 'tails' side of a coin is known as the 'reverse.'",
+      "Ancient Romans made coins with ridges to prevent counterfeiting.",
+      "The U.S. penny has been in circulation since 1793, making it one of the oldest coins still in use."
+  ];
+
+  const getRandomFact = () => {
+    let newIndex;
+    do {
+      newIndex = Math.floor(Math.random() * coinFacts.length);
+    } while (newIndex === lastFactIndex);
+    return coinFacts[newIndex];
+  };
+
+
+  useEffect(() => {
+    if (loadingStage === 'flipping' && showFunFact) {
+      const newFact = getRandomFact();
+      setLastFactIndex(coinFacts.indexOf(newFact));
+    }
+  }, [loadingStage, showFunFact]);
+
+
+
+  useEffect(() => {
+    if (result && result.outcome) {
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 5000); // Stop showing confetti after 5 seconds
+    }
+}, [result]);
+
+
 
 
   return (
     <div>
-
+      {showConfetti && <Confetti />}
     <div className='header'>
       <img src={logo}  id="logo" width="60px" alt="Company Logo" />
       <h2 className='title'>zkFlip</h2>
@@ -264,14 +316,41 @@ useEffect(() => {
 
             {loadingStage === 'confirmation' && (
               <div className='loading-stage'>
-                <p className='mb-0 uppercase'>Waiting for Confirmation...</p>
-                <p className='m-0 uppercase'>{getChoiceString(selectedOption)} FOR {(betAmount / 1e18).toFixed(2)} ETH</p>
+                <p className='mb-0 uppercase confirmation'>Waiting for Confirmation...</p>
+                <p className='m-0 uppercase confirmation'>{getChoiceString(selectedOption)} FOR {(betAmount / 1e18).toFixed(2)} ETH</p>
               </div>
             )}
 
-            {loadingStage === 'flipping' && (
+          {loadingStage === 'flipping' && (
               <div className='loading-stage'>
-                <p className='m-0 uppercase'>FLIPPING...</p>
+                  <p className='m-0 uppercase'>FLIPPING...</p>
+                  {showFunFact ? (
+                      <p className='fact'>Fun Fact: {getRandomFact()}</p>
+                  ) : (
+                      <p className='fact'>Please wait. This may take a moment. Do not leave or refresh.</p>
+                  )}
+              </div>
+          )}
+
+            {loadingStage === 'retrying' && (
+              <div className='loading-stage'>
+                <p className='m-0 '>Still trying... Hang tight!</p>
+                <p className='fact'> Fun Fact: {getRandomFact()}</p>
+
+              </div>
+            )}
+
+            {loadingStage === 'almostThere' && (
+              <div className='loading-stage'>
+                <p className='m-0 '>Almost there... Just a bit longer!</p>
+                <p className='fact'> Fun Fact: {getRandomFact()}</p>
+
+              </div>
+            )}
+
+            {loadingStage === 'finalizing' && (
+              <div className='loading-stage'>
+                <p className='m-0 uppercase'>Finalizing results... Get ready!</p>
               </div>
             )}
           </div>

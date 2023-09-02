@@ -13,6 +13,7 @@
     "@rainbow-me/rainbowkit": "^1.0.10",
     "ethers": "^5.7.2",
     "react": "^18.2.0",
+    "react-confetti": "^6.1.0",
     "react-dom": "^18.2.0",
     "typeface-bree-serif": "^1.1.13",
     "viem": "^1.9.5",

@@ -77,12 +77,24 @@
 
 }
 
-.m-0{
-  margin: 0px;
+.loading-stage{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.loading-stage {
-  gap: 0;
+.confirmation{
+  font-size: 1.3rem;
+}
+
+.fact{
+  font-size: 1rem;
+  width: 70%;
+}
+
+.m-0{
+  margin: 0px;
 }
 
 
