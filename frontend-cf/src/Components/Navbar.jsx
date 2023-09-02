@@ -6,18 +6,27 @@ import { useAccount, useDisconnect  } from 'wagmi'
 
 
 
-function Navbar({ userAddress, setUserAddress }) {
+function Navbar() {
   const { address, isConnected } = useAccount()
 
   const { disconnect } = useDisconnect()
+
+
+  const truncateAddress = (address) => {
+    if (!address) return "";
+    const start = address.substring(0, 6); // first 6 characters
+    const end = address.substring(address.length - 4); // last 4 characters
+    return `${start}...${end}`;
+  }
+
 
 
   return (
   <div className='navbar'>
     <img src={logo}  id="logo-navbar" width="40px" alt="Company Logo" />
     {isConnected ?(
-      <div>
-        <p>{address}</p>
+      <div className="nav-right">
+        <p>{truncateAddress(address)}</p>
         <button onClick={disconnect} className="game-button">
           Disconnect
         </button>
@@ -25,7 +34,7 @@ function Navbar({ userAddress, setUserAddress }) {
 
     ) :
 
-      (<div className='game-button'>
+      (<div className='connect'>
         <ConnectButton />
       </div>)
     }

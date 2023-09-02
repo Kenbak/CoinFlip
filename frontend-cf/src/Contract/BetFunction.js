@@ -1,3 +1,5 @@
+// BetFunctions
+
 import { ethers } from "ethers";
 import { getContractToWrite, getContractToRead, getProvider } from "./interact";
 import CoinFlipABI from "./CoinFlip.abi.json";
@@ -9,11 +11,25 @@ export async function checkNetwork() {
   }
 }
 
-export async function placeBet(choice) { // Added choice parameter
-    const contract = await getContractToWrite(VITE_COINFLIP_ADDRESS, CoinFlipABI);
-    const tx = await contract.placeBet(choice, { value: ethers.utils.parseEther("0.01") }); // 0.01 ether
-    await tx.wait();
+// export async function placeBet(choice) { // Added choice parameter
+//     const contract = await getContractToWrite(VITE_COINFLIP_ADDRESS, CoinFlipABI);
+//     const tx = await contract.placeBet(choice, { value: ethers.utils.parseEther("0.01") }); // 0.01 ether
+//     await tx.wait();
+// }
+
+export async function placeBet(choice, isUserWhitelisted) {
+  const contract = await getContractToWrite(VITE_COINFLIP_ADDRESS, CoinFlipABI);
+  const valueToSend = isUserWhitelisted ? ethers.utils.parseEther("0") : ethers.utils.parseEther("0.01");
+  const tx = await contract.placeBet(choice, { value: valueToSend });
+  await tx.wait();
 }
+
+export async function isUserWhitelisted(address) {
+  const contract = await getContractToRead(VITE_COINFLIP_ADDRESS, CoinFlipABI);
+  return await contract.isWhitelisted(address);
+}
+
+
 
 export async function resolveBet() {
   const contract = await getContractToWrite(VITE_COINFLIP_ADDRESS, CoinFlipABI);
@@ -37,4 +53,17 @@ export async function getCurrentBet(userAddress) {
 
 export async function getContractBalance() {
     return await getProvider().getBalance(VITE_COINFLIP_ADDRESS);
+}
+
+export async function addToWhitelist(address) {
+  const contract = await getContractToWrite(VITE_COINFLIP_ADDRESS, CoinFlipABI);
+  const tx = await contract.addToWhitelist(address);
+  await tx.wait();
+}
+
+
+export async function removeFromWhitelist(address) {
+  const contract = await getContractToWrite(VITE_COINFLIP_ADDRESS, CoinFlipABI);
+  const tx = await contract.removeFromWhitelist(address);
+  await tx.wait();
 }

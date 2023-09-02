@@ -8,3 +8,13 @@
   width: 100%;
   align-items: center;
 }
+
+
+.nav-right{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  p{
+    font-size: 1.2rem;
+  }
+}

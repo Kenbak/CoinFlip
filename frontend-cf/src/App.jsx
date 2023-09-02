@@ -7,7 +7,7 @@ import Navbar from './Components/Navbar';
 import 'typeface-bree-serif';
 import { VITE_NETWORK_ID, ALCHEMY_ID} from "./Contract/constants";
 import "@rainbow-me/rainbowkit/styles.css";
-import { getDefaultWallets, RainbowKitProvider} from "@rainbow-me/rainbowkit";
+import { getDefaultWallets, RainbowKitProvider, lightTheme} from "@rainbow-me/rainbowkit";
 import { connectorsForWallets} from "@rainbow-me/rainbowkit";
 import { argentWallet } from "@rainbow-me/rainbowkit/wallets";
 import { configureChains, createConfig, WagmiConfig} from "wagmi";
@@ -49,6 +49,15 @@ const wagmiConfig = createConfig({
   publicClient
 })
 
+const myCustomTheme = lightTheme({
+  accentColor: '#FFD541',
+  accentColorForeground: '#FF8B02',
+  borderRadius:"small", // or 'medium' or any other allowed value
+  fontStack: "system",  // or any other allowed value
+  overlayBlur: "none"    // or any other allowed value
+});
+
+
 
 
 function App() {
@@ -71,7 +80,7 @@ function App() {
   return (
     <div className="App">
      <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider chains={chains}>
+      <RainbowKitProvider chains={chains} theme={myCustomTheme}>
 
           <header className="App-header">
           <Navbar  userAddress={userAddress} setUserAddress={setUserAddress}/>

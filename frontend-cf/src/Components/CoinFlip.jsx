@@ -5,7 +5,7 @@ import logo from '../assets/images/zkflogo.png'
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect  } from 'wagmi'
 import { ethers } from "ethers";
-import { checkNetwork, placeBet, resolveBet, getCurrentBet, getContractBalance } from "../Contract/BetFunction";
+import { checkNetwork, placeBet, resolveBet, getCurrentBet, getContractBalance, isUserWhitelisted } from "../Contract/BetFunction";
 
 
 
@@ -18,6 +18,23 @@ function CoinFlip() {
   const [loadingStage, setLoadingStage] = useState(null);
   const [gameHistory, setGameHistory] = useState([]);
   const { address, isConnected } = useAccount()
+  const [isWhitelisted, setIsWhitelisted] = useState(false);
+  const [showGameHistory, setShowGameHistory] = useState(true);
+
+
+
+  useEffect(() => {
+    const checkWhitelistStatus = async () => {
+      if (address) {
+        const status = await isUserWhitelisted(address);
+        setIsWhitelisted(status);
+      }
+    };
+
+    checkWhitelistStatus();
+  }, [address]);
+
+
 
   useEffect(() => {
     const fetchGameHistory = async () => {
@@ -79,6 +96,8 @@ useEffect(() => {
 
   const handleTryAgain = () => {
     resetGame();
+    setIsWhitelisted(false);
+    setShowGameHistory(true);
   };
 
 
@@ -86,6 +105,7 @@ useEffect(() => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setShowGameHistory(false);
 
     if (selectedOption === null || betAmount === null) {
       alert("Please select the bet amount and choose Heads or Tails!");
@@ -97,8 +117,11 @@ useEffect(() => {
       setLoadingStage('confirmation');
        // First, check if user is connected to the correct network
        await checkNetwork();
-       // Place the bet on the Ethereum blockchain
-       await placeBet(selectedOption)
+        // Check if the user is whitelisted
+        const userIsWhitelisted = await isUserWhitelisted(address);
+
+        // Place the bet on the Ethereum blockchain
+        await placeBet(selectedOption, userIsWhitelisted);
 
       setLoadingStage('flipping');
       // Introduce another delay for the flipping animation
@@ -177,7 +200,7 @@ useEffect(() => {
       <div className='container'>
         <div className='game-infos'>
           <p className='mb-0'>Connect your wallet to flip!</p>
-          <div className='game-button'>
+          <div className='connect'>
             <ConnectButton />
           </div>
 
@@ -224,7 +247,11 @@ useEffect(() => {
 
               <div className='options'>
                 <label>FOR</label>
-                <button type="button"  className={`option ${selectedBet === 0.01e18 ? "selected" : ""}`}  onClick={selectBetAmount}>0,01 ETH</button>
+                {isWhitelisted ? (
+                  <div  className={`option ${selectedBet === 0.01e18 ? "selected" : ""}`} onClick={selectBetAmount}>Offered</div>
+                ) : (
+                  <button type="button" className={`option ${selectedBet === 0.01e18 ? "selected" : ""}`} onClick={selectBetAmount}>0.01 ETH</button>
+                )}
               </div>
               <button className='game-button' type="submit">Double or Nothing</button>
             </div>
@@ -262,11 +289,27 @@ useEffect(() => {
             ) : (
               <div>
                 <p className='mb-0'>YOU LOST</p>
-                <p className='lose'>{(betAmount / 1e18).toFixed(2)} ETH</p>
+                {isWhitelisted ? (
+                <p className='lose'>Better luck next time!</p>
+                ) : (
+                  <p className='lose'>{(betAmount / 1e18).toFixed(2)} ETH</p>
+                )}
                 <button onClick={handleTryAgain} className='game-button'>TRY AGAIN</button>
               </div>
             )}
           </div>
+        )}
+        {showGameHistory && (
+        <div className="game-history">
+          <p>LATEST FLIPS</p>
+          <ul className='history-list'>
+            {gameHistory.map((game, index) => (
+                <li key={index}>
+                      {game.user_address} called {game.choice} with {(game.bet_amount/ 1e18).toFixed(2)} ETH and {game.outcome ? <span className='win'>doubled up! 💰</span>: <span className='lose'>slipped away! 😏</span>}
+                </li>
+              ))}
+          </ul>
+        </div>
         )}
       </>
     )}
