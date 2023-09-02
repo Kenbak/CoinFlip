@@ -66,21 +66,6 @@
   },
   {
     "inputs": [],
-    "name": "BET_AMOUNT",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x3f9326af"
-  },
-  {
-    "inputs": [],
     "name": "MAX_WITHDRAWAL",
     "outputs": [
       {
@@ -122,6 +107,20 @@
     "stateMutability": "nonpayable",
     "type": "function",
     "signature": "0xe43252d7"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "addValidBetAmount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xae0c0c7b"
   },
   {
     "inputs": [
@@ -177,6 +176,21 @@
     "type": "function",
     "constant": true,
     "signature": "0x6f9fb98a"
+  },
+  {
+    "inputs": [],
+    "name": "houseEdgePercentage",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true,
+    "signature": "0x553c61dc"
   },
   {
     "inputs": [
@@ -259,12 +273,61 @@
     "signature": "0x8ab1d681"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "removeValidBetAmount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x3ab52a54"
+  },
+  {
     "inputs": [],
     "name": "resolveBet",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function",
     "signature": "0x8fced626"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_percentage",
+        "type": "uint256"
+      }
+    ],
+    "name": "setHouseEdgePercentage",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x114ca757"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "validBets",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true,
+    "signature": "0xf74c1e35"
   },
   {
     "inputs": [

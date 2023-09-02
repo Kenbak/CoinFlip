@@ -1,6 +1,6 @@
 // for testnet
 
-export const VITE_COINFLIP_ADDRESS = "0x8e1926B2A7f1524f4Bc36369A00212EB8bB48476"
+export const VITE_COINFLIP_ADDRESS = "0x7745D3ACf8F66460687606d8500BAD660fc7Ef48"
 
 
 export const VITE_RPC_URL="https://zksync2-testnet.zksync.dev"

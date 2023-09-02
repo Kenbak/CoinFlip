@@ -6,7 +6,7 @@ class GamesController < ApplicationController
   end
 
   def index
-    @games = Game.order(created_at: :desc).limit(5)
+    @games = Game.order(created_at: :desc).limit(20)
     render json: @games, status: :ok
   end
 

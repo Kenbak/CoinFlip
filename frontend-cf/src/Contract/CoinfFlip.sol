@@ -4,9 +4,10 @@ pragma solidity ^0.8.0;
 contract CoinFlip {
 
     address public owner;
-    uint256 public constant BET_AMOUNT = 10000000000000000; // 0.01 ether in wei
+    mapping(uint256 => bool) public validBets; // To store valid bet amounts
     uint256 public constant MAX_WITHDRAWAL = 1 ether;
     uint256 public constant WITHDRAWAL_COOLDOWN = 1 days;
+    uint256 public houseEdgePercentage = 750; // Default to 2%, can be changed by owner up to 7.5%
 
     uint256 public lastWithdrawal;
 
@@ -32,22 +33,36 @@ contract CoinFlip {
 
     constructor() {
         owner = msg.sender;
+        validBets[10000000000000000] = true; // 0.01 ether in wei as a valid bet by default
+    }
+
+    function setHouseEdgePercentage(uint256 _percentage) external onlyOwner {
+      require(_percentage <= 750, "Maximum house edge is 7.5%"); // 750 in basis points is 7.5%
+      houseEdgePercentage = _percentage;
+    }
+
+    function addValidBetAmount(uint256 _amount) external onlyOwner {
+        validBets[_amount] = true;
+    }
+
+    function removeValidBetAmount(uint256 _amount) external onlyOwner {
+        validBets[_amount] = false;
     }
 
     function fundContract() external payable onlyOwner {
         emit Funded(msg.sender, msg.value);
     }
 
-    function withdrawFunds(uint256 amount) external onlyOwner {
-        require(amount <= MAX_WITHDRAWAL, "Cannot withdraw more than 1 ETH at a time");
-        require(block.timestamp >= lastWithdrawal + WITHDRAWAL_COOLDOWN, "Must wait for withdrawal cooldown");
-        require(amount <= address(this).balance, "Amount is more than available balance");
+  function withdrawFunds(uint256 amount) external onlyOwner {
+    require(amount <= MAX_WITHDRAWAL, "Cannot withdraw more than 1 ETH at a time");
+    require(block.timestamp >= lastWithdrawal + WITHDRAWAL_COOLDOWN, "Must wait for withdrawal cooldown");
+    require(amount <= address(this).balance, "Amount is more than available balance");
 
-        lastWithdrawal = block.timestamp;
+    (bool success, ) = owner.call{value: amount}("");
+    require(success, "Transfer failed");
 
-        (bool success, ) = owner.call{value: amount}("");
-        require(success, "Transfer failed");
-    }
+    lastWithdrawal = block.timestamp;
+}
 
 
 
@@ -62,37 +77,45 @@ contract CoinFlip {
 
 
   // Add a new mapping to track if a whitelisted address has placed a bet
-mapping(address => bool) public whitelistedBetPlaced;
+  mapping(address => bool) public whitelistedBetPlaced;
 
-function placeBet(Choice _choice) external payable {
-    if (whitelist[msg.sender]) {
-        require(msg.value == 0, "Whitelisted addresses must not send any ether");
-        require(!whitelistedBetPlaced[msg.sender], "Whitelisted address has already placed a bet");
-        whitelistedBetPlaced[msg.sender] = true; // Set the flag
-    } else {
-        require(msg.value == BET_AMOUNT, "Bet amount must be 0.01 ETH");
-    }
-    require(_choice == Choice.Heads || _choice == Choice.Tails, "Invalid choice");
+  function placeBet(Choice _choice) external payable {
+      require(bets[msg.sender].blockNumber == 0, "A bet has already been placed");
+      if (whitelist[msg.sender]) {
+          require(msg.value == 0, "Whitelisted addresses must not send any ether");
+          require(!whitelistedBetPlaced[msg.sender], "Whitelisted address has already placed a bet");
+          whitelistedBetPlaced[msg.sender] = true; // Set the flag
+      } else {
+          require(validBets[msg.value], "Invalid bet amount");
+      }
+      require(_choice == Choice.Heads || _choice == Choice.Tails, "Invalid choice");
 
-    bets[msg.sender] = Bet(msg.value, block.number, _choice);
+      bets[msg.sender] = Bet(msg.value, block.number, _choice);
 
-    emit BetReceived(msg.sender, msg.value);
-}
+      emit BetReceived(msg.sender, msg.value);
+  }
 
-function resolveBet() external {
-    require(bets[msg.sender].blockNumber > 0, "No bet placed");
-    require(block.number > bets[msg.sender].blockNumber + 5, "Wait for more blocks");
+  function resolveBet() external {
+    Bet storage userBet = bets[msg.sender]; // Use storage pointer to user's bet
 
-    uint256 blockHash = uint256(blockhash(bets[msg.sender].blockNumber));
+    require(userBet.blockNumber > 0, "No bet placed");
+    require(block.number > userBet.blockNumber + 5, "Wait for more blocks");
+    require(block.number <= userBet.blockNumber + 256, "Bet is voided due to wait of more than 256 blocks");
+
+    uint256 blockHash = uint256(blockhash(userBet.blockNumber));
     bool result = blockHash % 2 == 0; // Even for Heads, Odd for Tails
 
-    bool win = (result && bets[msg.sender].choice == Choice.Heads) ||
-               (!result && bets[msg.sender].choice == Choice.Tails);
+    bool win = (result && userBet.choice == Choice.Heads) ||
+               (!result && userBet.choice == Choice.Tails);
+
+    uint256 potentialWinning = userBet.amount * 2; // Double the bet amount
+    uint256 houseEdge = (potentialWinning * houseEdgePercentage) / 10000; // Calculate house edge on the potential winning
+    uint256 payoutAmount = potentialWinning - houseEdge; // Subtract the house edge from the potential winning
+
+    // Reset bet
+    delete bets[msg.sender];
 
     if (win) {
-        uint256 houseEdge = BET_AMOUNT * 2 / 100; // 2% of the original bet
-        uint256 payoutAmount = (BET_AMOUNT * 2) - houseEdge; // Double minus the house edge
-
         require(address(this).balance >= payoutAmount, "Insufficient funds in contract");
 
         (bool success, ) = msg.sender.call{value: payoutAmount}("");
@@ -106,10 +129,7 @@ function resolveBet() external {
         whitelist[msg.sender] = false;
         whitelistedBetPlaced[msg.sender] = false; // Reset the flag
     }
-
-    // Reset bet
-    delete bets[msg.sender];
-}
+  }
 
     function getContractBalance() public view returns (uint256) {
         return address(this).balance;

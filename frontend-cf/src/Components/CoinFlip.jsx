@@ -66,9 +66,6 @@ function CoinFlip() {
 
 
 
-const MAX_RETRIES = 5; // Maximum number of retries
-const RETRY_INTERVAL = 15000; // Retry every 5 seconds
-
 
   const [selectedBet, setSelectedBet] = useState(null);
 
@@ -116,6 +113,9 @@ useEffect(() => {
   };
 
 
+
+  const MAX_RETRIES = 10; // Maximum number of retries
+  const RETRY_INTERVAL = 10000; // Retry every 10 seconds
 
 
   const handleSubmit = async (e) => {
@@ -243,7 +243,7 @@ useEffect(() => {
     <div>
       {showConfetti && <Confetti />}
     <div className='header'>
-      <img src={logo}  id="logo" width="60px" alt="Company Logo" />
+      {/* <img src={logo}  id="logo" width="60px" alt="Company Logo" /> */}
       <h2 className='title'>zkFlip</h2>
     </div>
     <p className='tagline'>Flip it 'til you make it!</p>
@@ -360,16 +360,18 @@ useEffect(() => {
           <div className='game-infos'>
 
             {result.outcome ? (
-              <div>
+              <div className='result-info'>
+                <p>Congratulations! 🎊</p>
                 <p className='mb-0'>YOU WON</p>
                 <p className='win'>{(betAmount / 1e18).toFixed(2)} ETH</p>
                 <button className='game-button' onClick={handleTryAgain}>TRY AGAIN</button>
               </div>
             ) : (
-              <div>
+              <div className='result-info'>
+                <p>So close! 😢 <br />Better luck next time!</p>
                 <p className='mb-0'>YOU LOST</p>
                 {isWhitelisted ? (
-                <p className='lose'>Better luck next time!</p>
+                <p className='lose'>Don't give up! 😌</p>
                 ) : (
                   <p className='lose'>{(betAmount / 1e18).toFixed(2)} ETH</p>
                 )}
