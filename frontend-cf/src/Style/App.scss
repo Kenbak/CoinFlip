@@ -25,7 +25,8 @@ body.dark {
   align-items: center;
   justify-content: flex-start;
   padding: 20px;
-  font-size: calc(10px + 2vmin);
+  // font-size: max(12px, min(calc(10px + 2vmin), 36px));
+
   color: $text;
   font-family: 'Bree Serif', serif;
 

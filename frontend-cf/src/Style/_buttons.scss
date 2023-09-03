@@ -9,6 +9,7 @@
   font-weight: bold;
   font-family: 'Bree Serif', serif;
   text-shadow: 1px 1px (beige);
+  transition: transform 0.2s ease, background-color 0.2s ease;
 
   &:hover {
     background-color: darken($color: $yellow, $amount: 10); // A slightly different shade of purple for hover effect
@@ -17,4 +18,9 @@
 
 .connect{
   font-size: 1.1rem;
+}
+
+.game-button:active {
+  transform: scale(0.95); // This scales the button down to 95% of its size when pressed
+  background-color: darken($color: $yellow, $amount: 15); // Makes the button a bit darker when pressed
 }

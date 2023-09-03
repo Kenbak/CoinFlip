@@ -5,7 +5,20 @@ import logo from '../assets/images/zkflogo.png'
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect  } from 'wagmi'
 import { ethers } from "ethers";
-import { checkNetwork, placeBet, resolveBet, getCurrentBet, getContractBalance, isUserWhitelisted } from "../Contract/BetFunction";
+import 'react-toastify/dist/ReactToastify.css';
+import {
+  checkNetwork,
+  placeBet,
+  getCurrentBet,
+  getContractBalance,
+  isUserWhitelisted,
+  claimReward,
+  getResult
+} from "../Contract/BetFunction";
+
+
+import { ToastContainer, toast } from 'react-toastify';
+
 import Confetti from 'react-confetti';
 
 
@@ -93,6 +106,8 @@ useEffect(() => {
     setResult(null);
     setLoading(false);
     setLoadingStage(null);
+    setIsWhitelisted(false);
+    setShowGameHistory(true);
 };
 
 
@@ -108,8 +123,6 @@ useEffect(() => {
 
   const handleTryAgain = () => {
     resetGame();
-    setIsWhitelisted(false);
-    setShowGameHistory(true);
   };
 
 
@@ -123,7 +136,10 @@ useEffect(() => {
     setShowGameHistory(false);
 
     if (selectedOption === null || betAmount === null) {
-        alert("Please select the bet amount and choose Heads or Tails!");
+        toast.warn("Please select the bet amount and choose Heads or Tails!", {
+          position: toast.POSITION.BOTTOM_RIGHT,
+          autoClose: false
+        })
         return;
     }
 
@@ -132,7 +148,28 @@ useEffect(() => {
         setLoadingStage('confirmation');
         await checkNetwork();
         const userIsWhitelisted = await isUserWhitelisted(address);
+
+      try{
         await placeBet(selectedOption, userIsWhitelisted);
+        toast.info('Bet Placed!', {
+          position: toast.POSITION.BOTTOM_RIGHT})
+
+        } catch (error) {
+
+        resetGame()
+        console.error("Error placing bet in CoinFlip Front:", error);
+        // alert(error.error.data.message);
+        if (error && error.error && error.error.data && error.error.data.message) {
+          let errorMessage = error.error.data.message;
+          if (errorMessage === "execution reverted: Claim your previous winnings first") {
+              errorMessage = "ERROR: Claim your previous winnings first!";
+          }
+          toast.error(errorMessage, {
+              position: toast.POSITION.BOTTOM_RIGHT
+          });
+      }
+        return; // Stops execution here
+       }
 
         setLoadingStage('flipping');
         await new Promise(resolve => setTimeout(resolve, 7000));
@@ -141,10 +178,14 @@ useEffect(() => {
         let resolved = false;
         let outcome;
 
+         console.log("Bet Placed, Checking Results")
+
         while (retries < MAX_RETRIES && !resolved) {
           try {
-              outcome = await resolveBet();
-              resolved = true;
+            outcome = await getResult(address);
+            console.log(outcome)
+
+            resolved = true;
           } catch (error) {
               retries++;
               if (retries === 1) {
@@ -167,6 +208,7 @@ useEffect(() => {
         if (!resolved) {
             throw new Error("Failed to resolve bet after multiple attempts.");
         }
+        console.log("Outcome after the while loop",outcome)
 
         const choiceString = selectedOption === 0 ? "heads" : "tails";
         await axios.post(`${BASE_API_URL}`, {
@@ -208,7 +250,17 @@ useEffect(() => {
       "Coins have been used as a form of currency for over 2,600 years.",
       "The 'tails' side of a coin is known as the 'reverse.'",
       "Ancient Romans made coins with ridges to prevent counterfeiting.",
-      "The U.S. penny has been in circulation since 1793, making it one of the oldest coins still in use."
+      "The U.S. penny has been in circulation since 1793, making it one of the oldest coins still in use.",
+      "zkSync is a layer 2 scaling solution for Ethereum, making transactions faster and cheaper.",
+      "Cryptocurrencies use cryptographic functions to secure transactions and control new coin creations.",
+      "Blockchain transactions are added in blocks, creating a continuous 'chain' of data.",
+      "The word 'cryptocurrency' comes from the term 'cryptography,' meaning secret writing.",
+      "The total value of all cryptocurrencies surpassed $2 trillion in 2021!",
+      "In ancient times, people used tools, jewelry, or even salt as a form of money before coins.",
+      "The technology behind zkSync is called 'zkRollups,' providing scalable, low-cost transactions on Ethereum.",
+      "Vitalik Buterin was only 19 when he proposed the idea of Ethereum in late 2013.",
+      "One of the earliest forms of money in China was shaped like a knife!",
+      "NFT stands for Non-Fungible Token, a unique digital asset verified on a blockchain.",
   ];
 
   const getRandomFact = () => {
@@ -236,12 +288,33 @@ useEffect(() => {
     }
 }, [result]);
 
+const handleClaimAndReset = async () => {
+  try {
+      await claimReward(); // Call the claimReward function from BetFunctions
+      resetGame(); // Reset the game after claiming the reward
+      toast.success('Reward Claimed!', {
+        position: toast.POSITION.BOTTOM_RIGHT
+    });
+  } catch (error) {
+
+      toast.error(error.error.data.message, {
+        position: toast.POSITION.BOTTOM_RIGHT
+    });
+  }
+};
+
+
 
 
 
   return (
+    <>
+
+      {showConfetti && <Confetti
+       width={window.innerWidth}
+        height={window.innerHeight} />}
     <div>
-      {showConfetti && <Confetti />}
+      <ToastContainer theme="colored" />
     <div className='header'>
       {/* <img src={logo}  id="logo" width="60px" alt="Company Logo" /> */}
       <h2 className='title'>zkFlip</h2>
@@ -323,7 +396,7 @@ useEffect(() => {
 
           {loadingStage === 'flipping' && (
               <div className='loading-stage'>
-                  <p className='m-0 uppercase'>FLIPPING...</p>
+                  <p className='m-0 uppercase confirmation'>FLIPPING...</p>
                   {showFunFact ? (
                       <p className='fact'>Fun Fact: {getRandomFact()}</p>
                   ) : (
@@ -334,7 +407,7 @@ useEffect(() => {
 
             {loadingStage === 'retrying' && (
               <div className='loading-stage'>
-                <p className='m-0 '>Still trying... Hang tight!</p>
+                <p className='m-0 confirmation '>Still trying... Hang tight!</p>
                 <p className='fact'> Fun Fact: {getRandomFact()}</p>
 
               </div>
@@ -342,7 +415,7 @@ useEffect(() => {
 
             {loadingStage === 'almostThere' && (
               <div className='loading-stage'>
-                <p className='m-0 '>Almost there... Just a bit longer!</p>
+                <p className='m-0 confirmation'>Almost there... Just a bit longer!</p>
                 <p className='fact'> Fun Fact: {getRandomFact()}</p>
 
               </div>
@@ -350,7 +423,7 @@ useEffect(() => {
 
             {loadingStage === 'finalizing' && (
               <div className='loading-stage'>
-                <p className='m-0 uppercase'>Finalizing results... Get ready!</p>
+                <p className='m-0 uppercase confirmation'>Finalizing results... Get ready!</p>
               </div>
             )}
           </div>
@@ -361,19 +434,19 @@ useEffect(() => {
 
             {result.outcome ? (
               <div className='result-info'>
-                <p>Congratulations! 🎊</p>
-                <p className='mb-0'>YOU WON</p>
-                <p className='win'>{(betAmount / 1e18).toFixed(2)} ETH</p>
-                <button className='game-button' onClick={handleTryAgain}>TRY AGAIN</button>
+                <p className='confirmation'>Congratulations! 🎊</p>
+                <p className='mb-0 confirmation'>YOU WON</p>
+                <p className='win confirmation'>{(betAmount / 1e18).toFixed(2)} ETH</p>
+                <button className='game-button' onClick={handleClaimAndReset}>CLAIM REWARDS</button>
               </div>
             ) : (
               <div className='result-info'>
-                <p>So close! 😢 <br />Better luck next time!</p>
-                <p className='mb-0'>YOU LOST</p>
+                <p className='confirmation'>So close! 😢 <br />Better luck next time!</p>
+                <p className='mb-0 confirmation'>YOU LOST</p>
                 {isWhitelisted ? (
                 <p className='lose'>Don't give up! 😌</p>
                 ) : (
-                  <p className='lose'>{(betAmount / 1e18).toFixed(2)} ETH</p>
+                  <p className='lose confirmation'>{(betAmount / 1e18).toFixed(2)} ETH</p>
                 )}
                 <button onClick={handleTryAgain} className='game-button'>TRY AGAIN</button>
               </div>
@@ -395,6 +468,7 @@ useEffect(() => {
       </>
     )}
   </div>
+    </>
 );
 }
 
