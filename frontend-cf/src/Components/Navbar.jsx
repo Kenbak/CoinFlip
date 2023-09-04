@@ -8,13 +8,12 @@ import { useAccount, useDisconnect, useBalance } from 'wagmi'
 
 function Navbar() {
   const { address, isConnected } = useAccount()
-  const { data } = useBalance({
+  const { data, isError, isLoading } = useBalance({
     address: address,
     watch: true,
   })
 
   const { disconnect } = useDisconnect()
-
 
   const truncateAddress = (address) => {
     if (!address) return "";
@@ -23,28 +22,30 @@ function Navbar() {
     return `${start}...${end}`;
   }
 
-
-
   return (
-  <div className='navbar'>
-    <img src={logo}  id="logo-navbar" width="50px" alt="Company Logo" />
-    {isConnected ?(
-      <div className="nav-right">
-        <p>{parseFloat(data.formatted).toFixed(2)} {data.symbol}</p><p>|</p>
-        <p>{truncateAddress(address)}</p>
-        <button onClick={disconnect} className="game-button">
-          Disconnect
-        </button>
-      </div>
-
-    ) :
-
+    <div className='navbar'>
+      <img src={logo}  id="logo-navbar" width="50px" alt="Company Logo" />
+      {isConnected ? (
+        <div className="nav-right">
+          {isLoading && <p>Fetching balance...</p>}
+          {isError && <p>Error fetching balance</p>}
+          {data && (
+            <>
+              <p>{parseFloat(data.formatted).toFixed(2)} {data.symbol}</p><p>|</p>
+              <p>{truncateAddress(address)}</p>
+            </>
+          )}
+          <button onClick={disconnect} className="game-button">
+            Disconnect
+          </button>
+        </div>
+      ) :
       (<div className='connect'>
         <ConnectButton />
       </div>)
-    }
-  </div>
-);
+      }
+    </div>
+  );
 }
 
 export default Navbar;

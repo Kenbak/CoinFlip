@@ -26,3 +26,32 @@
   transform: scale(0.95); // This scales the button down to 95% of its size when pressed
   background-color: darken($color: $yellow, $amount: 15); // Makes the button a bit darker when pressed
 }
+
+
+.tweet-button {
+  display: inline-block; // Ensuring it acts like a button when styled
+  background-color: #1DA1F2; // Twitter's signature blue color
+  color: white; // Text color for better contrast against the blue
+  border: none;
+  padding: 10px 15px; // A bit more horizontal padding for the longer text
+  border-radius: 4px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Bree Serif', serif;
+  //text-shadow: 1px 1px beige;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  transform: scale(1);
+  text-decoration: none; // Remove underline which is default for <a> tags
+
+  &:hover {
+    background-color: darken($color: #1DA1F2, $amount: 10); // Darker shade of Twitter blue for hover
+    transform: scale(1.05);
+    color: white; // Ensure the text color remains white on hover
+  }
+
+  &:active {
+    transform: scale(0.95);
+    background-color: darken($color: #1DA1F2, $amount: 15); // Even darker shade for active state
+  }
+}

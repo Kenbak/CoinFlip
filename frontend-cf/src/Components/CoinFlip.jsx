@@ -110,19 +110,31 @@ function CoinFlip() {
   }, [address]);
 
 
+  const fetchGameHistory = async () => {
+      try {
+          const response = await axios.get(`${BASE_API_URL}`); // Assuming the index action is at this endpoint
+          setGameHistory(response.data);
+      } catch (error) {
+          console.error("Error fetching game history:", error);
+      }
+  };
 
   useEffect(() => {
-    const fetchGameHistory = async () => {
-        try {
-            const response = await axios.get(`${BASE_API_URL}`); // Assuming the index action is at this endpoint
-            setGameHistory(response.data);
-        } catch (error) {
-            console.error("Error fetching game history:", error);
-        }
-    };
 
     fetchGameHistory();
 }, []);
+
+    useEffect(() => {
+      if (activeTab === 'leaderboard') {
+          fetchLeaderboard();
+      }
+    }, [activeTab]);
+
+    useEffect(() => {
+      if (activeTab === 'latestFlips') {
+          fetchGameHistory();
+      }
+    }, [activeTab]);
 
 
 
@@ -183,6 +195,7 @@ useEffect(() => {
     setShowGameHistory(false);
 
     if (selectedOption === null || betAmount === null) {
+        resetGame();
         toast.warn("Please select the bet amount and choose Heads or Tails!", {
           position: toast.POSITION.BOTTOM_RIGHT,
           autoClose: true
@@ -369,6 +382,14 @@ const truncateAddress = (address) => {
 
 
 
+const generateTweetURL = (payout, betAmount, choice) => {
+  const base = "https://twitter.com/intent/tweet?";
+  const tweetText = `text=${encodeURIComponent(`I just turned a ${betAmount} ETH bet on ${choice} into a ${payout} ETH win on @zk_flip! 💥 \n\n Dare to flip? You could be next: \n 👉 https://www.zkflip.bet 🎲💰 \n\n #zkFlip #DareToFlip`)}`;
+
+  return base + tweetText
+}
+
+
 
   return (
     <>
@@ -495,6 +516,7 @@ const truncateAddress = (address) => {
                   5. Click “Double or Nothing”.<br />
                   6. Click approve and wait for coin to spin<br />
                   7. Wait for the result without refreshing!<br />
+                  8. If you win, claim your rewards!<br />
                 </Typography>
 
               </div>
@@ -631,7 +653,7 @@ const truncateAddress = (address) => {
 
             {loadingStage === 'retrying' && (
               <div className='loading-stage'>
-                <p className='m-0 confirmation '>Still trying... Hang tight!</p>
+                <p className='m-0 confirmation '>Coin is flipping... Hang tight!</p>
                 <p className='fact'> Fun Fact: {getRandomFact()}</p>
 
               </div>
@@ -661,7 +683,17 @@ const truncateAddress = (address) => {
                 <p className='confirmation'>Congratulations! 🎊</p>
                 <p className='mb-0 confirmation'>YOU WON</p>
                 <p className='win confirmation'>{(betAmount / 1e18).toFixed(2)} ETH</p>
-                <button className='game-button' onClick={handleClaimAndReset}>CLAIM REWARDS</button>
+
+                <div className='button-wrapper'>
+                  <button className='game-button' onClick={handleClaimAndReset}>CLAIM REWARDS</button>
+                  <a
+                    href={generateTweetURL(((betAmount / 1e18).toFixed(2)) * 2, (betAmount / 1e18).toFixed(2), getChoiceString(selectedOption))}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className='twitter-share-button tweet-button'>
+                      Tweet your win!
+                  </a>
+                </div>
               </div>
             ) : (
               <div className='result-info'>
@@ -680,15 +712,18 @@ const truncateAddress = (address) => {
         {showGameHistory && (
         <div className="game-history">
         <div className='tabs-title'>
-          <p className="history-title"  onClick={() => setActiveTab('latestFlips')}>LATEST FLIPS</p>
-          <p className="history-title">|</p>
-          <p className="history-title" onClick={() => setActiveTab('leaderboard')}>LEADERBOARD</p>
-        </div>
-
-
+            <p
+              className={`history-title ${activeTab === 'latestFlips' ? 'active' : 'inactive'}`}
+              onClick={() => setActiveTab('latestFlips')}
+            >
+            LATEST FLIPS</p>
+            <p className="history-title">|</p>
+            <p
+              className={`history-title ${activeTab === 'leaderboard' ? 'active' : 'inactive'}`}
+              onClick={() => setActiveTab('leaderboard')}
+            >LEADERBOARD</p>
+          </div>
             {activeTab === 'latestFlips' ? (
-
-
                     <ul className='history-list'>
                         {gameHistory.map((game, index) => (
                             <li className='history-list-element' key={index}>
@@ -696,10 +731,7 @@ const truncateAddress = (address) => {
                             </li>
                         ))}
                     </ul>
-
             ) : (
-
-
               <table className='leaderboard-table'>
               <thead>
                   <tr>
@@ -720,7 +752,6 @@ const truncateAddress = (address) => {
           </table>
 
             )}
-
       </div>
         )}
       </>
