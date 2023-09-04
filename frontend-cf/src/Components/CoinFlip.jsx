@@ -15,6 +15,10 @@ import {
   claimReward,
   getResult
 } from "../Contract/BetFunction";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 
 
 import { ToastContainer, toast } from 'react-toastify';
@@ -27,7 +31,21 @@ const BASE_API_URL = import.meta.env.DEV
   ? import.meta.env.VITE_REACT_APP_DEVELOPMENT_URL
   : import.meta.env.VITE_REACT_APP_PRODUCTION_URL;
 
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    color:"#4D5297",
+    display: "flex",
+    flexDirection: "column",
 
+
+  };
 
 function CoinFlip() {
 
@@ -43,6 +61,15 @@ function CoinFlip() {
   const [showFunFact, setShowFunFact] = useState(false);
   const [lastFactIndex, setLastFactIndex] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [openFaq, setOpenFaq] = useState(false);
+
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const handleOpenFaq = () => setOpenFaq(true);
+  const handleCloseFaq = () => setOpenFaq(false);
 
 
 
@@ -324,21 +351,129 @@ const handleClaimAndReset = async () => {
     {!isConnected ? (
       <div className='container'>
         <div className='game-infos'>
-          <p className='mb-0'>Connect your wallet to flip!</p>
+          <p className='mb-0 confirmation'>Connect your wallet to flip!</p>
           <div className='connect'>
             <ConnectButton />
           </div>
 
         </div>
         <div className="game-history">
-          <p>LATEST FLIPS</p>
+          <p className="history-title">LATEST FLIPS</p>
           <ul className='history-list'>
               {gameHistory.map((game, index) => (
-                  <li key={index}>
+                  <li className='history-list-element' key={index}>
                         {game.user_address} called {game.choice} with {(game.bet_amount/ 1e18).toFixed(2)} ETH and {game.outcome ? <span className='win'>doubled up! 💰</span>: <span className='lose'>slipped away! 😏</span>}
                   </li>
               ))}
           </ul>
+        </div>
+
+        <div className='footer'>
+        <p className='modal-link' onClick={handleOpen}>How to Play</p>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+            sx={{
+              background: "rgba(0, 0, 0, 0.8)"
+
+            }}
+          >
+            <Box sx={style}>
+              <div style={{padding:"20px"}}>
+                <Typography
+                sx={{
+                  fontFamily:"'Bree Serif'",
+                  fontWeight:"normal",
+                  fontSize:"1.5rem"
+                }}
+                id="modal-modal-title" variant="h6" component="h2">
+                  How to Play ?
+                </Typography>
+                <Typography
+                sx={{
+                  fontFamily:"'Bree Serif'",
+                  fontWeight:"normal",
+                  mt: 2,
+                  pb: 2,
+
+                }}
+                id="modal-modal-description" >
+                  1. Connect your Wallet. <br />
+                  2. Check zkSync network and fund balance. <br />
+                  3. Pick either heads or tails. <br />
+                  4. Select your desired flip amount.<br />
+                  5. Click “Double or Nothing”.<br />
+                  6. Click approve and wait for coin to spin<br />
+                  7. Wait for the result without refreshing!<br />
+                </Typography>
+
+              </div>
+              <div style={{borderBottom:"1px solid rgba(0, 0, 0, 0.2)"}}></div>
+              <div style={{padding: "20px", display:"flex", flexDirection:"column", background:"rgb(247 248 255)"}}>
+
+              <button onClick={handleClose}className='game-button'>Got It!</button>
+              </div>
+            </Box>
+          </Modal>
+          <p>|</p>
+          <p className='modal-link' onClick={handleOpenFaq}>FAQ</p>
+          <Modal
+            open={openFaq}
+            onClose={handleCloseFaq}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+            sx={{
+              background: "rgba(0, 0, 0, 0.8)"
+
+            }}
+          >
+            <Box sx={style}>
+              <div style={{padding:"20px"}}>
+                <Typography
+                sx={{
+                  fontFamily:"'Bree Serif'",
+                  fontWeight:"normal",
+                  fontSize:"1.5rem"
+                }}
+                id="modal-modal-title" variant="h6" component="h2">
+                  Frequently Asked Questions
+                </Typography>
+                <Typography
+                sx={{
+                  fontFamily:"'Bree Serif'",
+                  fontWeight:"normal",
+                  mt: 2,
+                  pb: 2,
+                  fontSize:"1rem"
+
+                }}
+                id="modal-modal-description" >
+
+                <h4  className='mb-0'>What is zkFlip (ZKF)?</h4>
+                zkFlip is a smart contract game on zkSync where players can bet their ETH on a simple coin flip. Players have a 50/50 chance to double their bet or lose it, with a house edge of 5%.
+
+
+                <h4 className='mb-0'>How do I know I can trust ZKF?</h4>
+                zkFlip operates transparently on the zkSync platform. Every transaction is on-chain and can be audited by anyone, ensuring utmost transparency and trustworthiness.
+
+
+                <h4 className='mb-0'>How and when can I claim my winnings?</h4>
+                If you win, you'll be able claim your reward. Always ensure to claim your previous winnings before placing a new bet.
+
+                <h4 className='mb-0'>Where can I learn more or get support?</h4>
+                Follow us on Twitter! We will assist and answer any further questions you might have.
+                </Typography>
+
+              </div>
+              <div style={{borderBottom:"1px solid rgba(0, 0, 0, 0.2)"}}></div>
+              <div style={{padding: "20px", display:"flex", flexDirection:"column", background:"rgb(247 248 255)"}}>
+
+              <button onClick={handleCloseFaq}className='game-button'>Got It!</button>
+              </div>
+            </Box>
+          </Modal>
         </div>
       </div>
     ) : (
@@ -455,10 +590,10 @@ const handleClaimAndReset = async () => {
         )}
         {showGameHistory && (
         <div className="game-history">
-          <p>LATEST FLIPS</p>
+          <p className='history-title'>LATEST FLIPS</p>
           <ul className='history-list'>
             {gameHistory.map((game, index) => (
-                <li key={index}>
+                <li className='history-list-element' key={index}>
                       {game.user_address} called {game.choice} with {(game.bet_amount/ 1e18).toFixed(2)} ETH and {game.outcome ? <span className='win'>doubled up! 💰</span>: <span className='lose'>slipped away! 😏</span>}
                 </li>
               ))}

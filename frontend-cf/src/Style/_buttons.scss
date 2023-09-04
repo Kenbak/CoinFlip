@@ -10,9 +10,11 @@
   font-family: 'Bree Serif', serif;
   text-shadow: 1px 1px (beige);
   transition: transform 0.2s ease, background-color 0.2s ease;
+  transform: scale(1);
 
   &:hover {
     background-color: darken($color: $yellow, $amount: 10); // A slightly different shade of purple for hover effect
+    transform: scale(1.05);
   }
 }
 

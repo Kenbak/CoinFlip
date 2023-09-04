@@ -44,7 +44,7 @@ if (targetGroup) {
 }
 const connectors = connectorsForWallets(walletGroups);
 const wagmiConfig = createConfig({
-  autoConnect: true,
+  autoConnect: false,
   connectors,
   publicClient
 })
