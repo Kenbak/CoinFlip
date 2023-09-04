@@ -19,6 +19,9 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTwitter } from '@fortawesome/free-brands-svg-icons';
+
 
 
 import { ToastContainer, toast } from 'react-toastify';
@@ -63,6 +66,9 @@ function CoinFlip() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [open, setOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(false);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [activeTab, setActiveTab] = useState('latestFlips');
+
 
 
   const handleOpen = () => setOpen(true);
@@ -73,6 +79,20 @@ function CoinFlip() {
 
 
 
+
+  const fetchLeaderboard = async () => {
+    try {
+        const response = await axios.get(`${BASE_API_URL}/leaderboard`);
+        setLeaderboard(response.data);
+        console.log(response.data)
+    } catch (error) {
+        console.error("Error fetching leaderboard:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchLeaderboard();
+  }, []);
 
 
 
@@ -165,7 +185,7 @@ useEffect(() => {
     if (selectedOption === null || betAmount === null) {
         toast.warn("Please select the bet amount and choose Heads or Tails!", {
           position: toast.POSITION.BOTTOM_RIGHT,
-          autoClose: false
+          autoClose: true
         })
         return;
     }
@@ -173,7 +193,15 @@ useEffect(() => {
     try {
         setLoading(true);
         setLoadingStage('confirmation');
-        await checkNetwork();
+        try {await checkNetwork();
+        }
+        catch (error){
+          toast.warn("You're on the wrong network. Please switch to the correct network.", {
+            position: toast.POSITION.BOTTOM_RIGHT,
+            autoClose: true
+          })
+
+        }
         const userIsWhitelisted = await isUserWhitelisted(address);
 
       try{
@@ -242,7 +270,8 @@ useEffect(() => {
             user_address: address,
             bet_amount: betAmount,
             choice: choiceString,
-            outcome: outcome
+            outcome: outcome,
+            payout: (outcome ? 0.02 : null)
         });
 
         setResult({ outcome: outcome });
@@ -330,6 +359,13 @@ const handleClaimAndReset = async () => {
   }
 };
 
+const truncateAddress = (address) => {
+  if (!address) return "";
+  const start = address.substring(0, 6); // first 6 characters
+  const end = address.substring(address.length - 4); // last 4 characters
+  return `${start}...${end}`;
+}
+
 
 
 
@@ -348,6 +384,8 @@ const handleClaimAndReset = async () => {
     </div>
     <p className='tagline'>Flip it 'til you make it!</p>
 
+
+
     {!isConnected ? (
       <div className='container'>
         <div className='game-infos'>
@@ -357,15 +395,65 @@ const handleClaimAndReset = async () => {
           </div>
 
         </div>
+
+
+        <a href="https://twitter.com/zk_flip" rel="noreferrer" target='_blank' className='modal-link social'>
+            <FontAwesomeIcon icon={faTwitter} />
+        </a>
+
+
         <div className="game-history">
-          <p className="history-title">LATEST FLIPS</p>
-          <ul className='history-list'>
-              {gameHistory.map((game, index) => (
-                  <li className='history-list-element' key={index}>
-                        {game.user_address} called {game.choice} with {(game.bet_amount/ 1e18).toFixed(2)} ETH and {game.outcome ? <span className='win'>doubled up! 💰</span>: <span className='lose'>slipped away! 😏</span>}
-                  </li>
-              ))}
-          </ul>
+          <div className='tabs-title'>
+            <p
+              className={`history-title ${activeTab === 'latestFlips' ? 'active' : 'inactive'}`}
+              onClick={() => setActiveTab('latestFlips')}
+            >
+            LATEST FLIPS</p>
+            <p className="history-title">|</p>
+            <p
+              className={`history-title ${activeTab === 'leaderboard' ? 'active' : 'inactive'}`}
+              onClick={() => setActiveTab('leaderboard')}
+            >LEADERBOARD</p>
+          </div>
+
+
+
+
+              {activeTab === 'latestFlips' ? (
+
+
+                      <ul className='history-list'>
+                          {gameHistory.map((game, index) => (
+                              <li className='history-list-element' key={index}>
+                                  {truncateAddress(game.user_address)} called {game.choice} with {(game.bet_amount / 1e18).toFixed(2)} ETH and {game.outcome ? <span className='win'>doubled up! 💰</span>: <span className='lose'>slipped away! 😏</span>}
+                              </li>
+                          ))}
+                      </ul>
+
+              ) : (
+
+
+                <table className='leaderboard-table'>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Address</th>
+                        <th>Games Played</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {leaderboard.map((entry, index) => (
+                        <tr key={index}>
+                            <td>{index + 1}</td>
+                            <td>{truncateAddress(entry[0])}</td>
+                            <td>{entry[1]}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+              )}
+
         </div>
 
         <div className='footer'>
@@ -419,6 +507,7 @@ const handleClaimAndReset = async () => {
           </Modal>
           <p>|</p>
           <p className='modal-link' onClick={handleOpenFaq}>FAQ</p>
+
           <Modal
             open={openFaq}
             onClose={handleCloseFaq}
@@ -590,15 +679,49 @@ const handleClaimAndReset = async () => {
         )}
         {showGameHistory && (
         <div className="game-history">
-          <p className='history-title'>LATEST FLIPS</p>
-          <ul className='history-list'>
-            {gameHistory.map((game, index) => (
-                <li className='history-list-element' key={index}>
-                      {game.user_address} called {game.choice} with {(game.bet_amount/ 1e18).toFixed(2)} ETH and {game.outcome ? <span className='win'>doubled up! 💰</span>: <span className='lose'>slipped away! 😏</span>}
-                </li>
-              ))}
-          </ul>
+        <div className='tabs-title'>
+          <p className="history-title"  onClick={() => setActiveTab('latestFlips')}>LATEST FLIPS</p>
+          <p className="history-title">|</p>
+          <p className="history-title" onClick={() => setActiveTab('leaderboard')}>LEADERBOARD</p>
         </div>
+
+
+            {activeTab === 'latestFlips' ? (
+
+
+                    <ul className='history-list'>
+                        {gameHistory.map((game, index) => (
+                            <li className='history-list-element' key={index}>
+                                {truncateAddress(game.user_address)} called {game.choice} with {(game.bet_amount / 1e18).toFixed(2)} ETH and {game.outcome ? <span className='win'>doubled up! 💰</span>: <span className='lose'>slipped away! 😏</span>}
+                            </li>
+                        ))}
+                    </ul>
+
+            ) : (
+
+
+              <table className='leaderboard-table'>
+              <thead>
+                  <tr>
+                      <th>Rank</th>
+                      <th>Address</th>
+                      <th>Games Played</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {leaderboard.map((entry, index) => (
+                      <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td>{truncateAddress(entry[0])}</td>
+                          <td>{entry[1]}</td>
+                      </tr>
+                  ))}
+              </tbody>
+          </table>
+
+            )}
+
+      </div>
         )}
       </>
     )}

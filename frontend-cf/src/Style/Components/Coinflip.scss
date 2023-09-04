@@ -83,17 +83,78 @@
   }
 }
 
+.tabs-title{
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
 .modal-link{
   text-decoration: underline;
+  color: #4D5297;
   cursor: pointer;
+  &:visited{
+    color: #4D5297;
+  }
   &:hover{
     color: lighten($color: #4D5297, $amount: 10);
+  }
+}
+
+.leaderboard-table {
+  width: 100%; // Utilizes the full width of its container.
+  border-collapse: collapse; // Ensures borders don't double up.
+  margin: 20px 0; // Space above and below the table.
+  font-size: 1.2rem; // Font size for the table.
+
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+  }
+
+  th, td {
+    padding: 8px 15px; // Space inside each cell.
+    text-align: center; // Align text to the left.
+    border-bottom: 2px solid #EAEAEA; // Light gray border for the cells.
+  }
+
+  th {
+    background-color: #e3e4f0;
+    color: #4d5297;
+    font-weight: 200;
+    //font-weight: bold; // Makes the header text bold.
+  }
+
+  tr:hover {
+    background-color: #F5F5F5; // Light gray background for hover effect on rows.
+  }
+
+  td {
+    padding-left: 25px; // Increases left padding for cells for spacing.
+  }
+
+  // Adjust the first column's width and center its content.
+  td:first-child, th:first-child {
+    width: 50px;
+    text-align: center;
   }
 }
 
 .history-title{
   font-size: 1.3rem;
   margin: 0;
+  cursor: pointer;
+
+  &.active {
+    color: #4D5297; // Or the color you're currently using for the text.
+  }
+
+  &.inactive {
+    color: lighten($color: #4D5297, $amount: 40); // This will grey out the inactive tab. Adjust the amount as needed.
+  }
+
+  &:hover{
+    color: lighten($color: #4D5297, $amount: 10);
+  }
 
   @media (max-width: 768px) {
     font-size: 1rem;
@@ -155,6 +216,15 @@
 
 }
 
+.social{
+  position: fixed;
+  bottom: 1.8rem;
+  left: 1.8rem;
+  font-size: 1.8rem;
+  @media (max-width: 768px) {
+    position: absolute;
+  }
+}
 
 
 .option {

@@ -16,7 +16,7 @@ export async function checkNetwork() {
     }
   } catch (error) {
     console.error("Network check error:", error);
-    alert("You're on the wrong network. Please switch to the correct network.");
+    throw error
   }
 }
 

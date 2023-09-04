@@ -117,12 +117,13 @@ function isWhitelisted(address user) public view returns (bool) {
     require(success, "Transfer failed");
 
     emit RewardClaimed(msg.sender, payoutAmount);
-}
-     function getContractBalance() public view returns (uint256) {
-        return address(this).balance;
+  }
+
+    function getContractBalance() public view returns (uint256) {
+      return address(this).balance;
     }
 
-        function fundContract() external payable onlyOwner {
+    function fundContract() external payable onlyOwner {
 
     }
 
@@ -132,7 +133,7 @@ function isWhitelisted(address user) public view returns (bool) {
     (bool success, ) = owner.call{value: amount}("");
     require(success, "Transfer failed");
 
-}
+  }
 
   function setHouseEdgePercentage(uint256 _percentage) external onlyOwner {
       require(_percentage <= 500, "Maximum house edge is 5%"); // 500 in basis points is 5%
