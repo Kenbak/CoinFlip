@@ -3,6 +3,8 @@ import "../Style/Components/Navbar.scss";
 import logo from '../assets/images/zkflogo.png'
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect, useBalance } from 'wagmi'
+import { truncateAddress } from './utility'
+
 
 
 
@@ -15,12 +17,7 @@ function Navbar() {
 
   const { disconnect } = useDisconnect()
 
-  const truncateAddress = (address) => {
-    if (!address) return "";
-    const start = address.substring(0, 6); // first 6 characters
-    const end = address.substring(address.length - 4); // last 4 characters
-    return `${start}...${end}`;
-  }
+
 
   return (
     <div className='navbar'>
@@ -31,7 +28,8 @@ function Navbar() {
           {isError && <p>Error fetching balance</p>}
           {data && (
             <>
-              <p>{parseFloat(data.formatted).toFixed(2)} {data.symbol}</p><p>|</p>
+              <p>{parseFloat(data.formatted).toFixed(2)} {data.symbol}</p>
+              <p id="none">|</p>
               <p>{truncateAddress(address)}</p>
             </>
           )}

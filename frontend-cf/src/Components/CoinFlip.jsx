@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import "../Style/Components/Coinflip.scss";
-import logo from '../assets/images/zkflogo.png'
+import logo from "../assets/images/zkflogo.png"
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect  } from 'wagmi'
 import { ethers } from "ethers";
@@ -9,46 +9,31 @@ import 'react-toastify/dist/ReactToastify.css';
 import {
   checkNetwork,
   placeBet,
-  getCurrentBet,
-  getContractBalance,
   isUserWhitelisted,
   claimReward,
   getResult
 } from "../Contract/BetFunction";
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTwitter } from '@fortawesome/free-brands-svg-icons';
-
-
-
+import FAQModal from './FaqModal';
+import HowToPlayModal from './HowToPlayModal';
+import GameHistory from './GameHistory';
 import { ToastContainer, toast } from 'react-toastify';
-
 import Confetti from 'react-confetti';
 
 
 
-const BASE_API_URL = import.meta.env.DEV
+  const BASE_API_URL = import.meta.env.DEV
   ? import.meta.env.VITE_REACT_APP_DEVELOPMENT_URL
   : import.meta.env.VITE_REACT_APP_PRODUCTION_URL;
 
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    color:"#4D5297",
-    display: "flex",
-    flexDirection: "column",
 
 
-  };
+  const MAX_RETRIES = 10; // Maximum number of retries
+  const RETRY_INTERVAL = 6000; // Retry every 10 seconds
+
+
+
 
 function CoinFlip() {
 
@@ -68,78 +53,47 @@ function CoinFlip() {
   const [openFaq, setOpenFaq] = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
   const [activeTab, setActiveTab] = useState('latestFlips');
-
-
-
+  const [selectedBet, setSelectedBet] = useState(null);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
   const handleOpenFaq = () => setOpenFaq(true);
   const handleCloseFaq = () => setOpenFaq(false);
 
+  const toastConfig = {
+    position: toast.POSITION.BOTTOM_RIGHT,
+    autoClose: true
+};
 
-
-
-  const fetchLeaderboard = async () => {
-    try {
-        const response = await axios.get(`${BASE_API_URL}/leaderboard`);
-        setLeaderboard(response.data);
-        console.log(response.data)
-    } catch (error) {
-        console.error("Error fetching leaderboard:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchLeaderboard();
-  }, []);
-
-
-
-
-
-  useEffect(() => {
-    const checkWhitelistStatus = async () => {
-      if (address) {
-        const status = await isUserWhitelisted(address);
-        setIsWhitelisted(status);
-      }
+    const fetchData = async (url, setter) => {
+        try {
+            const response = await axios.get(url);
+            setter(response.data);
+        } catch (error) {
+            console.error(`Error fetching data from ${url}:`, error);
+        }
     };
 
-    checkWhitelistStatus();
-  }, [address]);
-
-
-  const fetchGameHistory = async () => {
-      try {
-          const response = await axios.get(`${BASE_API_URL}`); // Assuming the index action is at this endpoint
-          setGameHistory(response.data);
-      } catch (error) {
-          console.error("Error fetching game history:", error);
-      }
-  };
-
-  useEffect(() => {
-
-    fetchGameHistory();
-}, []);
+    const handleFetchError = (error, customMessage) => {
+        console.error("Error:", error.message || error);
+        toast.error(customMessage || error.message, toastConfig);
+    };
 
     useEffect(() => {
-      if (activeTab === 'leaderboard') {
-          fetchLeaderboard();
-      }
+        if (activeTab === 'leaderboard') {
+            fetchData(`${BASE_API_URL}/leaderboard`, setLeaderboard);
+        } else if (activeTab === 'latestFlips') {
+            fetchData(`${BASE_API_URL}`, setGameHistory);
+        }
     }, [activeTab]);
 
     useEffect(() => {
-      if (activeTab === 'latestFlips') {
-          fetchGameHistory();
-      }
-    }, [activeTab]);
+        if (address) {
+            isUserWhitelisted(address).then(setIsWhitelisted);
+        }
+    }, [address]);
 
 
 
-
-  const [selectedBet, setSelectedBet] = useState(null);
 
   const handleOptionChange = (value) => {
     if (selectedOption === value) {
@@ -147,13 +101,13 @@ function CoinFlip() {
     } else {
       setSelectedOption(value);
     }
-};
+  };
 
-useEffect(() => {
-  if (!isConnected) {
-      resetGame();
-  }
-}, [isConnected]);
+  useEffect(() => {
+    if (!isConnected) {
+        resetGame();
+    }
+  }, [isConnected]);
 
 
 
@@ -183,11 +137,6 @@ useEffect(() => {
   const handleTryAgain = () => {
     resetGame();
   };
-
-
-
-  const MAX_RETRIES = 10; // Maximum number of retries
-  const RETRY_INTERVAL = 10000; // Retry every 10 seconds
 
 
   const handleSubmit = async (e) => {
@@ -240,7 +189,7 @@ useEffect(() => {
        }
 
         setLoadingStage('flipping');
-        await new Promise(resolve => setTimeout(resolve, 7000));
+        await new Promise(resolve => setTimeout(resolve, 4000));
 
         let retries = 0;
         let resolved = false;
@@ -291,19 +240,11 @@ useEffect(() => {
         setLoading(false);
         setLoadingStage(null);
 
-        const updatedHistory = await axios.get(`${BASE_API_URL}`);
-        setGameHistory(updatedHistory.data);
-
-    } catch (error) {
-        setLoading(false);
-        setLoadingStage(null);
-        if (error.response && error.response.data) {
-            console.error("Error:", error.response.data);
-        } else {
-            console.error("Error:", error.message);
-        }
-    }
-};
+        fetchData(`${BASE_API_URL}`, setGameHistory);
+      } catch (error) {
+          handleFetchError(error);
+      }
+  };
 
     const getChoiceString = (option) => {
       return option === 0 ? "Heads" : "Tails";
@@ -355,39 +296,33 @@ useEffect(() => {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000); // Stop showing confetti after 5 seconds
     }
-}, [result]);
+  }, [result]);
 
-const handleClaimAndReset = async () => {
-  try {
-      await claimReward(); // Call the claimReward function from BetFunctions
-      resetGame(); // Reset the game after claiming the reward
-      toast.success('Reward Claimed!', {
-        position: toast.POSITION.BOTTOM_RIGHT
-    });
-  } catch (error) {
+  const handleClaimAndReset = async () => {
+    try {
+        await claimReward(); // Call the claimReward function from BetFunctions
+        resetGame(); // Reset the game after claiming the reward
+        toast.success('Reward Claimed!', {
+          position: toast.POSITION.BOTTOM_RIGHT
+      });
+    } catch (error) {
 
-      toast.error(error.error.data.message, {
-        position: toast.POSITION.BOTTOM_RIGHT
-    });
+        toast.error(error.error.data.message, {
+          position: toast.POSITION.BOTTOM_RIGHT
+      });
+    }
+  };
+
+
+
+
+
+  const generateTweetURL = (payout, betAmount, choice) => {
+    const base = "https://twitter.com/intent/tweet?";
+    const tweetText = `text=${encodeURIComponent(`I just turned a ${betAmount} ETH bet on ${choice} into a ${payout} ETH win on @zk_flip! 💥 \n\n Dare to flip? You could be next: \n 👉 https://www.zkflip.bet 🎲💰 \n\n #zkFlip #DareToFlip`)}`;
+
+    return base + tweetText
   }
-};
-
-const truncateAddress = (address) => {
-  if (!address) return "";
-  const start = address.substring(0, 6); // first 6 characters
-  const end = address.substring(address.length - 4); // last 4 characters
-  return `${start}...${end}`;
-}
-
-
-
-
-const generateTweetURL = (payout, betAmount, choice) => {
-  const base = "https://twitter.com/intent/tweet?";
-  const tweetText = `text=${encodeURIComponent(`I just turned a ${betAmount} ETH bet on ${choice} into a ${payout} ETH win on @zk_flip! 💥 \n\n Dare to flip? You could be next: \n 👉 https://www.zkflip.bet 🎲💰 \n\n #zkFlip #DareToFlip`)}`;
-
-  return base + tweetText
-}
 
 
 
@@ -423,168 +358,25 @@ const generateTweetURL = (payout, betAmount, choice) => {
         </a>
 
 
-        <div className="game-history">
-          <div className='tabs-title'>
-            <p
-              className={`history-title ${activeTab === 'latestFlips' ? 'active' : 'inactive'}`}
-              onClick={() => setActiveTab('latestFlips')}
-            >
-            LATEST FLIPS</p>
-            <p className="history-title">|</p>
-            <p
-              className={`history-title ${activeTab === 'leaderboard' ? 'active' : 'inactive'}`}
-              onClick={() => setActiveTab('leaderboard')}
-            >LEADERBOARD</p>
-          </div>
-
-
-
-
-              {activeTab === 'latestFlips' ? (
-
-
-                      <ul className='history-list'>
-                          {gameHistory.map((game, index) => (
-                              <li className='history-list-element' key={index}>
-                                  {truncateAddress(game.user_address)} called {game.choice} with {(game.bet_amount / 1e18).toFixed(2)} ETH and {game.outcome ? <span className='win'>doubled up! 💰</span>: <span className='lose'>slipped away! 😏</span>}
-                              </li>
-                          ))}
-                      </ul>
-
-              ) : (
-
-
-                <table className='leaderboard-table'>
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Address</th>
-                        <th>Games Played</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {leaderboard.map((entry, index) => (
-                        <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{truncateAddress(entry[0])}</td>
-                            <td>{entry[1]}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-
-              )}
-
-        </div>
+        <GameHistory
+              activeTab={activeTab}
+              gameHistory={gameHistory}
+              leaderboard={leaderboard}
+              setActiveTab={setActiveTab}
+            />
 
         <div className='footer'>
-        <p className='modal-link' onClick={handleOpen}>How to Play</p>
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-            sx={{
-              background: "rgba(0, 0, 0, 0.8)"
-
-            }}
-          >
-            <Box sx={style}>
-              <div style={{padding:"20px"}}>
-                <Typography
-                sx={{
-                  fontFamily:"'Bree Serif'",
-                  fontWeight:"normal",
-                  fontSize:"1.5rem"
-                }}
-                id="modal-modal-title" variant="h6" component="h2">
-                  How to Play ?
-                </Typography>
-                <Typography
-                sx={{
-                  fontFamily:"'Bree Serif'",
-                  fontWeight:"normal",
-                  mt: 2,
-                  pb: 2,
-
-                }}
-                id="modal-modal-description" >
-                  1. Connect your Wallet. <br />
-                  2. Check zkSync network and fund balance. <br />
-                  3. Pick either heads or tails. <br />
-                  4. Select your desired flip amount.<br />
-                  5. Click “Double or Nothing”.<br />
-                  6. Click approve and wait for coin to spin<br />
-                  7. Wait for the result without refreshing!<br />
-                  8. If you win, claim your rewards!<br />
-                </Typography>
-
-              </div>
-              <div style={{borderBottom:"1px solid rgba(0, 0, 0, 0.2)"}}></div>
-              <div style={{padding: "20px", display:"flex", flexDirection:"column", background:"rgb(247 248 255)"}}>
-
-              <button onClick={handleClose}className='game-button'>Got It!</button>
-              </div>
-            </Box>
-          </Modal>
+          <p className='modal-link' onClick={handleOpen}>How to Play</p>
+          <HowToPlayModal
+            isOpen={open}
+            handleClose={handleClose}
+          />
           <p>|</p>
           <p className='modal-link' onClick={handleOpenFaq}>FAQ</p>
-
-          <Modal
-            open={openFaq}
-            onClose={handleCloseFaq}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-            sx={{
-              background: "rgba(0, 0, 0, 0.8)"
-
-            }}
-          >
-            <Box sx={style}>
-              <div style={{padding:"20px"}}>
-                <Typography
-                sx={{
-                  fontFamily:"'Bree Serif'",
-                  fontWeight:"normal",
-                  fontSize:"1.5rem"
-                }}
-                id="modal-modal-title" variant="h6" component="h2">
-                  Frequently Asked Questions
-                </Typography>
-                <Typography
-                sx={{
-                  fontFamily:"'Bree Serif'",
-                  fontWeight:"normal",
-                  mt: 2,
-                  pb: 2,
-                  fontSize:"1rem"
-
-                }}
-                id="modal-modal-description" >
-
-                <h4  className='mb-0'>What is zkFlip (ZKF)?</h4>
-                zkFlip is a smart contract game on zkSync where players can bet their ETH on a simple coin flip. Players have a 50/50 chance to double their bet or lose it, with a house edge of 5%.
-
-
-                <h4 className='mb-0'>How do I know I can trust ZKF?</h4>
-                zkFlip operates transparently on the zkSync platform. Every transaction is on-chain and can be audited by anyone, ensuring utmost transparency and trustworthiness.
-
-
-                <h4 className='mb-0'>How and when can I claim my winnings?</h4>
-                If you win, you'll be able claim your reward. Always ensure to claim your previous winnings before placing a new bet.
-
-                <h4 className='mb-0'>Where can I learn more or get support?</h4>
-                Follow us on Twitter! We will assist and answer any further questions you might have.
-                </Typography>
-
-              </div>
-              <div style={{borderBottom:"1px solid rgba(0, 0, 0, 0.2)"}}></div>
-              <div style={{padding: "20px", display:"flex", flexDirection:"column", background:"rgb(247 248 255)"}}>
-
-              <button onClick={handleCloseFaq}className='game-button'>Got It!</button>
-              </div>
-            </Box>
-          </Modal>
+          <FAQModal
+            isOpen={openFaq}
+            handleClose={handleCloseFaq}
+          />
         </div>
       </div>
     ) : (
@@ -710,49 +502,32 @@ const generateTweetURL = (payout, betAmount, choice) => {
           </div>
         )}
         {showGameHistory && (
-        <div className="game-history">
-        <div className='tabs-title'>
-            <p
-              className={`history-title ${activeTab === 'latestFlips' ? 'active' : 'inactive'}`}
-              onClick={() => setActiveTab('latestFlips')}
-            >
-            LATEST FLIPS</p>
-            <p className="history-title">|</p>
-            <p
-              className={`history-title ${activeTab === 'leaderboard' ? 'active' : 'inactive'}`}
-              onClick={() => setActiveTab('leaderboard')}
-            >LEADERBOARD</p>
-          </div>
-            {activeTab === 'latestFlips' ? (
-                    <ul className='history-list'>
-                        {gameHistory.map((game, index) => (
-                            <li className='history-list-element' key={index}>
-                                {truncateAddress(game.user_address)} called {game.choice} with {(game.bet_amount / 1e18).toFixed(2)} ETH and {game.outcome ? <span className='win'>doubled up! 💰</span>: <span className='lose'>slipped away! 😏</span>}
-                            </li>
-                        ))}
-                    </ul>
-            ) : (
-              <table className='leaderboard-table'>
-              <thead>
-                  <tr>
-                      <th>Rank</th>
-                      <th>Address</th>
-                      <th>Games Played</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {leaderboard.map((entry, index) => (
-                      <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td>{truncateAddress(entry[0])}</td>
-                          <td>{entry[1]}</td>
-                      </tr>
-                  ))}
-              </tbody>
-          </table>
+        <div className='container'>
+          <GameHistory
+            activeTab={activeTab}
+            gameHistory={gameHistory}
+            leaderboard={leaderboard}
+            setActiveTab={setActiveTab}
+          />
 
-            )}
-      </div>
+          <a href="https://twitter.com/zk_flip" rel="noreferrer" target='_blank' className='modal-link social'>
+                      <FontAwesomeIcon icon={faTwitter} />
+          </a>
+          <div className='footer'>
+            <p className='modal-link' onClick={handleOpen}>How to Play</p>
+            <HowToPlayModal
+              isOpen={open}
+              handleClose={handleClose}
+            />
+            <p>|</p>
+            <p className='modal-link' onClick={handleOpenFaq}>FAQ</p>
+            <FAQModal
+              isOpen={openFaq}
+              handleClose={handleCloseFaq}
+            />
+          </div>
+        </div>
+
         )}
       </>
     )}

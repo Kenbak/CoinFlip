@@ -78,8 +78,13 @@
   border-radius: 10px;
   border: 3px solid #4D5297;
   margin-top: 30px;
+  overflow-y: scroll;
+  height: 211px;
+  width: 440px;
   @media (max-width: 768px) {
     padding: 20px;
+    height: 160px;
+    width: 309px;
   }
 }
 
@@ -101,11 +106,12 @@
   }
 }
 
+
 .leaderboard-table {
   width: 100%; // Utilizes the full width of its container.
   border-collapse: collapse; // Ensures borders don't double up.
   margin: 20px 0; // Space above and below the table.
-  font-size: 1.2rem; // Font size for the table.
+  font-size: 1rem; // Font size for the table.
 
   @media (max-width: 768px) {
     font-size: 0.7rem;
@@ -158,6 +164,28 @@
 
   @media (max-width: 768px) {
     font-size: 1rem;
+  }
+}
+
+.rank-container{
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: center;
+}
+
+// Styling for badge icons
+.badge-icon {
+
+  width: 15px; // Adjust width as needed
+  height: auto; // Maintain aspect ratio
+  vertical-align: middle;
+}
+
+// For mobile responsiveness, adjust badge size
+@media (max-width: 768px) {
+  .badge-icon {
+      width: 10px;
   }
 }
 
