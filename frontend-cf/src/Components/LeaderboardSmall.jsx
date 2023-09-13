@@ -29,8 +29,11 @@ function Leaderboard({ leaderboard }) {
                             {index === 2 && <img src={bronzeBadge} alt="Gold Badge" className="badge-icon" />} {/* Bronze for 3rd */}
                             {index === 3 && <img src={platinumBadge} alt="Gold Badge" className="badge-icon" />} {/* Star for 4th */}
                             {index === 4 && <img src={platinumBadge} alt="Gold Badge" className="badge-icon" />} {/* Star for 5th */}
-                            {index >= 5 && index <= 7 && <img src={emeraldBadge} alt="Gold Badge" className="badge-icon" />} {/* Diamond for 6th to 8th */}
-                            {index >= 8 && <img src={saphirBadge} alt="Gold Badge" className="badge-icon" />} {/* Wave for 9th and 10th */}
+                            {index >= 5 && index <= 6 && <img src={emeraldBadge} alt="Gold Badge" className="badge-icon" />} {/* Diamond for 6th to 8th */}
+                            {index === 7 && <img src={saphirBadge} alt="Sapphire Badge" className="badge-icon" />} {/* Sapphire for 9th */}
+                            {index === 8 && <img src={saphirBadge} alt="Sapphire Badge" className="badge-icon" />} {/* Sapphire for 9th */}
+                            {index === 9 && <img src={saphirBadge} alt="Sapphire Badge" className="badge-icon" />} {/* Sapphire for 10th */}
+
                           </div>
                         </td>
                         <td>{truncateAddress(entry[0])}</td>
