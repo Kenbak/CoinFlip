@@ -1,6 +1,6 @@
 // LatestFlips.jsx
 import React from 'react';
-import { truncateAddress } from './utility'
+import { truncateAddress, timeAgo } from './utility';
 
 
 function LatestFlips({ gameHistory }) {
@@ -8,7 +8,13 @@ function LatestFlips({ gameHistory }) {
     <ul className='history-list'>
       {gameHistory.map((game, index) => (
         <li className='history-list-element' key={index}>
-          {truncateAddress(game.user_address)} called {game.choice} with {(game.bet_amount / 1e18).toFixed(2)} ETH and {game.outcome ? <span className='win'>doubled up! 💰</span> : <span className='lose'>slipped away! 😏</span>}
+
+          <div className='history-list-element-info'>
+            {truncateAddress(game.user_address)} called {game.choice} and {game.outcome ? <span className='win'>doubled up! 💰</span> : <span className='lose'>slipped away! 😏</span> }
+          </div>
+          <div>
+            <span className='time'>{timeAgo(game.created_at)}</span>
+          </div>
         </li>
       ))}
     </ul>

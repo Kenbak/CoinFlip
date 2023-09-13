@@ -80,11 +80,12 @@
   margin-top: 30px;
   overflow-y: scroll;
   height: 211px;
-  width: 440px;
+  width: 600px;
+  box-sizing: border-box;
   @media (max-width: 768px) {
     padding: 20px;
     height: 160px;
-    width: 309px;
+    width: 100%;
   }
 }
 
@@ -260,6 +261,58 @@
   }
 }
 
+.wl-title{
+  background-color:rgb(91, 159, 91);
+  color: white;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  font-weight: 400;
+  border-radius: 10px;
+  border: 2px solid rgb(7, 120, 7);
+}
+
+.time{
+  font-size: 0.9rem;
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  @media (max-width: 768px) {
+    font-size: 0.6rem;
+    font-weight: 300;
+
+  }
+}
+
+.history-list-element-info{
+  margin-bottom: 3px;
+  margin-top: 3px;
+}
+
+
+.option-wl {
+  display: inline-block;
+  padding: 5px 20px;
+  border-radius: 30px;
+  background-color: rgb(91, 159, 91);
+  border: 2px solid rgb(7, 120, 7);
+  color: white;
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-family: 'Bree Serif', serif;
+  transform: scale(1);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+
+  &:hover {
+    background-color: darken($color: rgb(104, 180, 104), $amount: 10); // A slightly different shade of purple for hover effect
+    transform: scale(1.05);
+  }
+
+  &.selected {
+    background-color: darken($color: rgb(104, 180, 104), $amount: 15); // A darker shade of purple to indicate selection
+    transform: scale(1.05);
+  }
+}
+
 
 .option {
   display: inline-block;
@@ -287,10 +340,22 @@
 
 .history-list-element{
 
-  // border-bottom: 1px solid rgb(212, 212, 212);
-  // border-top: 1px solid rgb(212, 212, 212);
+  border-bottom: 1px solid rgb(203 205 229);
+
+  // border: 1px solid rgba(0,0,0,.125);
+   padding: 0.5rem;
+   display: flex;
+   width: 100%;
+   box-sizing: border-box;
+   position: relative;
 
 }
+
+.history-list-element:first-child {
+  border-top: 1px solid rgb(203 205 229);
+}
+
+
 
 
 .history-list{
@@ -298,9 +363,11 @@
   flex-direction: column;
   align-items: flex-start;
   list-style: none;
-  gap: 10px;
+  // gap: 10px;
   font-size: 1rem;
   padding: 0px;
+  width: 100%;
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
     font-size: 0.7rem;

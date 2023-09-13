@@ -298,6 +298,27 @@ function CoinFlip() {
     }
   }, [result]);
 
+
+
+  useEffect(() => {
+    // Define a function to fetch the whitelisting status
+    const fetchWhitelistStatus = async () => {
+        if (address) {
+            const status = await isUserWhitelisted(address);
+            setIsWhitelisted(status);
+        }
+    };
+
+    // Call the function immediately to get the initial status
+    fetchWhitelistStatus();
+
+    // Set up an interval to periodically check the status
+    const intervalId = setInterval(fetchWhitelistStatus, 10000); // checks every 10 seconds
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, [address]);
+
   const handleClaimAndReset = async () => {
     try {
         await claimReward(); // Call the claimReward function from BetFunctions
@@ -390,6 +411,7 @@ function CoinFlip() {
             </label> */}
             <div className='game-infos'>
 
+              {isWhitelisted && (<h1 className='wl-title'>Whitelist Flip</h1>)}
               <div className='options'>
                 <label>I PICK...</label>
                 <div className='inputs'>
@@ -411,7 +433,7 @@ function CoinFlip() {
               <div className='options'>
                 <label>FOR</label>
                 {isWhitelisted ? (
-                  <div  className={`option ${selectedBet === 0.01e18 ? "selected" : ""}`} onClick={selectBetAmount}>Offered</div>
+                  <div  className={`option-wl ${selectedBet === 0.01e18 ? "selected" : ""}`} onClick={selectBetAmount}>Offered</div>
                 ) : (
                   <button type="button" className={`option ${selectedBet === 0.01e18 ? "selected" : ""}`} onClick={selectBetAmount}>0.01 ETH</button>
                 )}
@@ -492,7 +514,7 @@ function CoinFlip() {
                 <p className='confirmation'>So close! 😢 <br />Better luck next time!</p>
                 <p className='mb-0 confirmation'>YOU LOST</p>
                 {isWhitelisted ? (
-                <p className='lose'>Don't give up! 😌</p>
+                <p className='lose'>Nothing</p>
                 ) : (
                   <p className='lose confirmation'>{(betAmount / 1e18).toFixed(2)} ETH</p>
                 )}
@@ -511,7 +533,7 @@ function CoinFlip() {
           />
 
           <a href="https://twitter.com/zk_flip" rel="noreferrer" target='_blank' className='modal-link social'>
-                      <FontAwesomeIcon icon={faTwitter} />
+           <FontAwesomeIcon icon={faTwitter} />
           </a>
           <div className='footer'>
             <p className='modal-link' onClick={handleOpen}>How to Play</p>
