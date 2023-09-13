@@ -30,7 +30,7 @@ import Confetti from 'react-confetti';
 
 
   const MAX_RETRIES = 10; // Maximum number of retries
-  const RETRY_INTERVAL = 6000; // Retry every 10 seconds
+  const RETRY_INTERVAL = 8000; // Retry every 10 seconds
 
 
 
@@ -136,6 +136,7 @@ function CoinFlip() {
 
   const handleTryAgain = () => {
     resetGame();
+    fetchData(`${BASE_API_URL}/leaderboard`, setLeaderboard);
   };
 
 
@@ -190,7 +191,7 @@ function CoinFlip() {
        }
 
         setLoadingStage('flipping');
-        await new Promise(resolve => setTimeout(resolve, 4000));
+        await new Promise(resolve => setTimeout(resolve, 6000));
 
         let retries = 0;
         let resolved = false;
@@ -327,6 +328,7 @@ function CoinFlip() {
         toast.success('Reward Claimed!', {
           position: toast.POSITION.BOTTOM_RIGHT
       });
+      fetchData(`${BASE_API_URL}/leaderboard`, setLeaderboard);
     } catch (error) {
 
         toast.error(error.error.data.message, {

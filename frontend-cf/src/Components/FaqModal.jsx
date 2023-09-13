@@ -20,9 +20,11 @@ function FAQModal({ isOpen, handleClose }) {
       <h4 className='mb-0'>How do I know I can trust ZKF?</h4>
       zkFlip operates transparently on the zkSync platform. Every transaction is on-chain and can be audited by anyone, ensuring utmost transparency and trustworthiness.
 
-
       <h4 className='mb-0'>How and when can I claim my winnings?</h4>
       If you win, you'll be able claim your reward. Always ensure to claim your previous winnings before placing a new bet. If you forgot, you can always do it via the contract directly.
+
+      <h4 className='mb-0'>How are points calculated and how can I earn more?</h4>
+      Points are earned based on your participation and wins in zkFlip. Each game you play earns you points, and winning doubles those points. The more you play and win, the higher your score! Keep flipping to maximize your points and climb the leaderboard.
 
       <h4 className='mb-0'>Are there any special rewards for top players?</h4>
       Yes! At zkFlip, we recognize and reward our top players with special badges:<br />
@@ -36,7 +38,6 @@ function FAQModal({ isOpen, handleClose }) {
       These badges are a testament to the skill and dedication of our top players and are displayed proudly next to their names on the leaderboard. Our top flippers stand a chance to receive exclusive rewards.
 
 
-
       <h4 className='mb-0'>Is there a referral program?</h4>
       We're in the process of developing a referral program to reward our loyal players. By introducing friends to zkFlip, you'll have the opportunity to earn bonuses and special rewards.
 
@@ -45,6 +46,8 @@ function FAQModal({ isOpen, handleClose }) {
 
       <h4 className='mb-0'>Where can I learn more or get support?</h4>
       Follow us on Twitter! We will assist and answer any further questions you might have.
+
+
   </>
   );
   return <ModalComponent title="Frequently Asked Questions" content={content} isOpen={isOpen} handleClose={handleClose} />;
