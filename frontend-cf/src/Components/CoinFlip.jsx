@@ -324,7 +324,7 @@ function CoinFlip() {
   const handleClaimAndReset = async () => {
     try {
         await claimReward(); // Call the claimReward function from BetFunctions
-        resetGame(); // Reset the game after claiming the reward
+
         toast.success('Reward Claimed!', {
           position: toast.POSITION.BOTTOM_RIGHT
       });
@@ -441,7 +441,7 @@ function CoinFlip() {
                   <button type="button" className={`option ${selectedBet === 0.01e18 ? "selected" : ""}`} onClick={selectBetAmount}>0.01 ETH</button>
                 )}
               </div>
-              <button className='game-button' type="submit">Double or Nothing</button>
+              <button className='game-button' id="start-game" type="submit">Double or Nothing</button>
             </div>
           </form>
         )}
@@ -510,6 +510,7 @@ function CoinFlip() {
                     className='twitter-share-button tweet-button'>
                       Tweet your win!
                   </a>
+                  <button className="try-again-button" onClick={handleTryAgain}>Try again</button>
                 </div>
               </div>
             ) : (
@@ -521,7 +522,7 @@ function CoinFlip() {
                 ) : (
                   <p className='lose confirmation'>{(betAmount / 1e18).toFixed(2)} ETH</p>
                 )}
-                <button onClick={handleTryAgain} className='game-button'>TRY AGAIN</button>
+                <button onClick={handleTryAgain} className='try-again-button'>TRY AGAIN</button>
               </div>
             )}
           </div>
