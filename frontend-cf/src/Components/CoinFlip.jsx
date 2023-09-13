@@ -145,6 +145,7 @@ function CoinFlip() {
 
     if (selectedOption === null || betAmount === null) {
         resetGame();
+
         toast.warn("Please select the bet amount and choose Heads or Tails!", {
           position: toast.POSITION.BOTTOM_RIGHT,
           autoClose: true
