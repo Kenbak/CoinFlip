@@ -5,7 +5,7 @@ import './Style/App.scss';
 import CoinFlip from './Components/CoinFlip';
 import Navbar from './Components/Navbar';
 import 'typeface-bree-serif';
-import { VITE_NETWORK_ID, ALCHEMY_ID} from "./Contract/constants";
+import { VITE_NETWORK_ID} from "./Contract/constants";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider, lightTheme} from "@rainbow-me/rainbowkit";
 import { connectorsForWallets} from "@rainbow-me/rainbowkit";
@@ -18,6 +18,8 @@ import { publicProvider } from "wagmi/providers/public";
 import { getAccount } from '@wagmi/core';
 
 
+const ALCHEMY_ID = import.meta.env.VITE_REACT_APP_ALCHEMY_ID;
+
 let chain = zkSync;
 if(VITE_NETWORK_ID == "280") {
   chain = zkSyncTestnet;
@@ -29,8 +31,8 @@ const { chains, publicClient } = configureChains(
     publicProvider()
   ]
 );
-const appName = "zkmarkets";
-const projectId = "02d5a339901030c2011e352c479def50";
+const appName = "zkFlip";
+const projectId = "da9c563007234557ec5ab891d1411da7";
 const { wallets: walletGroups } = getDefaultWallets({
   appName: appName,
   projectId: projectId,
