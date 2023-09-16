@@ -33,12 +33,12 @@ function Navbar() {
               <p>{truncateAddress(address)}</p>
             </>
           )}
-          <button onClick={disconnect} className="game-button" id="connect">
+          <button onClick={disconnect} className="game-button">
             Disconnect
           </button>
         </div>
       ) :
-      (<div  id="connect">
+      (<div className='connect'>
         <ConnectButton />
       </div>)
       }

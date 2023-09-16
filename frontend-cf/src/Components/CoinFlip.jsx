@@ -3,7 +3,8 @@ import axios from 'axios';
 import "../Style/Components/Coinflip.scss";
 import logo from "../assets/images/zkflogo.png"
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount, useDisconnect  } from 'wagmi';
+import { useAccount, useDisconnect  } from 'wagmi'
+import { ethers } from "ethers";
 import 'react-toastify/dist/ReactToastify.css';
 import {
   checkNetwork,
@@ -501,15 +502,15 @@ function CoinFlip() {
                 <p className='win confirmation'>{(betAmount / 1e18).toFixed(2)} ETH</p>
 
                 <div className='button-wrapper'>
-                  <button className='game-button' onClick={handleClaimAndReset}>Claim Rewards</button>
+                  <button className='game-button' onClick={handleClaimAndReset}>CLAIM REWARDS</button>
                   <a
                     href={generateTweetURL(((betAmount / 1e18).toFixed(2)) * 2, (betAmount / 1e18).toFixed(2), getChoiceString(selectedOption))}
                     target="_blank"
                     rel="noopener noreferrer"
                     className='twitter-share-button tweet-button'>
-                      Tweet Your Win!
+                      Tweet your win!
                   </a>
-                  <button className="try-again-button" onClick={handleTryAgain}>Play Again</button>
+                  <button className="try-again-button" onClick={handleTryAgain}>Try again</button>
                 </div>
               </div>
             ) : (
