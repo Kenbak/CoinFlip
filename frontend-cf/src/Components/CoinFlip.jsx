@@ -15,7 +15,7 @@ import {
   getResult
 } from "../Contract/BetFunction";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTwitter } from '@fortawesome/free-brands-svg-icons';
+import { faTwitter, faDiscord } from '@fortawesome/free-brands-svg-icons';
 import FAQModal from './FaqModal';
 import HowToPlayModal from './HowToPlayModal';
 import GameHistory from './GameHistory';
@@ -455,12 +455,12 @@ const selectBetAmount = (amount) => {
                 ) : (
                 <div className='inputs'>
                   <button type="button"
-                    className={`option ${selectedBet?.toString() === ethers.utils.parseEther('0.005').toString() ? "selected" : ""}`}
+                    className={`option bet ${selectedBet?.toString() === ethers.utils.parseEther('0.005').toString() ? "selected" : ""}`}
                     onClick={() => selectBetAmount(0.005)}>
                     0.005 ETH
                   </button>
                   <button type="button"
-                    className={`option ${selectedBet?.toString() === ethers.utils.parseEther('0.01').toString() ? "selected" : ""}`}
+                    className={`option bet ${selectedBet?.toString() === ethers.utils.parseEther('0.01').toString() ? "selected" : ""}`}
                     onClick={() => selectBetAmount(0.01)}>
                     0.01 ETH
                   </button>
@@ -566,10 +566,15 @@ const selectBetAmount = (amount) => {
             leaderboard={leaderboard}
             setActiveTab={setActiveTab}
           />
+          <div className='social'>
+            <a href="https://twitter.com/zk_flip" rel="noreferrer" target='_blank' className='modal-link '>
+            <FontAwesomeIcon icon={faTwitter} />
+            </a>
+            <a href="https://discord.gg/wPZZRpE5Uj" rel="noreferrer" target='_blank' className='modal-link'>
+            <FontAwesomeIcon icon={faDiscord} />
+            </a>
+          </div>
 
-          <a href="https://twitter.com/zk_flip" rel="noreferrer" target='_blank' className='modal-link social'>
-           <FontAwesomeIcon icon={faTwitter} />
-          </a>
           <div className='footer'>
             <p className='modal-link' onClick={handleOpen}>How to Play</p>
             <HowToPlayModal

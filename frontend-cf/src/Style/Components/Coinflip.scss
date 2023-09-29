@@ -1,6 +1,8 @@
 @import '../_colors.scss';
 @import '../_buttons.scss';
 
+
+
 .title {
   font-size: 5rem;
   margin: 0px;
@@ -43,6 +45,8 @@
   margin-top: 0px;
   color: green;
 }
+
+
 
 .lose{
   margin-top: 0px;
@@ -258,6 +262,8 @@
   bottom: 1.8rem;
   left: 1.8rem;
   font-size: 1.8rem;
+  display: flex;
+  gap: 15px;
   @media (max-width: 768px) {
     position: absolute;
   }
@@ -338,6 +344,10 @@
     background-color: darken($color: $text-light, $amount: 15); // A darker shade of purple to indicate selection
     transform: scale(1.05);
   }
+}
+
+.bet{
+  font-size: 1.1rem;
 }
 
 .history-list-element{
