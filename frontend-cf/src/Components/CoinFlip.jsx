@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
+
 import axios from 'axios';
 import "../Style/Components/Coinflip.scss";
 import logo from "../assets/images/zkflogo.png"
@@ -123,15 +125,19 @@ function CoinFlip() {
 };
 
 
-  const selectBetAmount = () => {
-    if (selectedBet === 0.01e18) {
+const selectBetAmount = (amount) => {
+  const amountInWei = ethers.utils.parseEther(amount.toString());
+  if (selectedBet?.toString() === amountInWei.toString()) {
       setSelectedBet(null); // Deselect the bet amount if it's clicked again
       setBetAmount(null);
-    } else {
-      setSelectedBet(0.01e18);
-      setBetAmount(0.01e18); // Set bet amount to 0.01 ETH in wei
-    }// Set bet amount to 0.01 ETH in wei
-  };
+  } else {
+      setSelectedBet(amountInWei); // Set selected bet amount in Wei
+      setBetAmount(amountInWei); // Set bet amount in Wei
+  }
+};
+
+
+
 
   const handleTryAgain = () => {
     resetGame();
@@ -168,7 +174,7 @@ function CoinFlip() {
         const userIsWhitelisted = await isUserWhitelisted(address);
 
       try{
-        await placeBet(selectedOption, userIsWhitelisted);
+        await placeBet(selectedOption, userIsWhitelisted, ethers.utils.formatEther(selectedBet));
         toast.info('Bet Placed!', {
           position: toast.POSITION.BOTTOM_RIGHT})
 
@@ -185,6 +191,14 @@ function CoinFlip() {
           toast.error(errorMessage, {
               position: toast.POSITION.BOTTOM_RIGHT
           });
+      } else {
+        let errorMessage = error.data.message;
+        if (errorMessage === "insufficient balance for transfer") {
+          errorMessage = "Insufficient balance to place bet!";
+      }
+        toast.error(errorMessage, {
+          position: toast.POSITION.BOTTOM_RIGHT
+      });
       }
         return; // Stops execution here
        }
@@ -230,12 +244,14 @@ function CoinFlip() {
 
         const choiceString = selectedOption === 0 ? "heads" : "tails";
         await axios.post(`${BASE_API_URL}`, {
-            user_address: address,
-            bet_amount: betAmount,
-            choice: choiceString,
-            outcome: outcome,
-            payout: (outcome ? 0.02 : null)
-        });
+          user_address: address,
+          bet_amount: parseFloat(ethers.utils.formatEther(betAmount)), // Convert betAmount to decimal string and then to float
+          choice: choiceString,
+          outcome: outcome,
+          // If outcome is true, payout is double the betAmount, else it's null
+          payout: outcome ? parseFloat(ethers.utils.formatEther(betAmount.mul(2))) : null
+      });
+
 
         setResult({ outcome: outcome });
         setLoading(false);
@@ -299,7 +315,7 @@ function CoinFlip() {
     }
   }, [result]);
 
-
+  console.log('Selected Bet:', selectedBet?.toString());
 
   useEffect(() => {
     // Define a function to fetch the whitelisting status
@@ -437,7 +453,21 @@ function CoinFlip() {
                 {isWhitelisted ? (
                   <div  className={`option-wl ${selectedBet === 0.01e18 ? "selected" : ""}`} onClick={selectBetAmount}>Offered</div>
                 ) : (
-                  <button type="button" className={`option ${selectedBet === 0.01e18 ? "selected" : ""}`} onClick={selectBetAmount}>0.01 ETH</button>
+                <div className='inputs'>
+                  <button type="button"
+                    className={`option ${selectedBet?.toString() === ethers.utils.parseEther('0.005').toString() ? "selected" : ""}`}
+                    onClick={() => selectBetAmount(0.005)}>
+                    0.005 ETH
+                  </button>
+                  <button type="button"
+                    className={`option ${selectedBet?.toString() === ethers.utils.parseEther('0.01').toString() ? "selected" : ""}`}
+                    onClick={() => selectBetAmount(0.01)}>
+                    0.01 ETH
+                  </button>
+
+
+
+                </div>
                 )}
               </div>
               <button className='game-button' id="start-game" type="submit">Double or Nothing</button>
@@ -452,7 +482,9 @@ function CoinFlip() {
             {loadingStage === 'confirmation' && (
               <div className='loading-stage'>
                 <p className='mb-0 uppercase confirmation'>Waiting for Confirmation...</p>
-                <p className='m-0 uppercase confirmation'>{getChoiceString(selectedOption)} FOR {(betAmount / 1e18).toFixed(2)} ETH</p>
+                <p className='m-0 uppercase confirmation'>{getChoiceString(selectedOption)} FOR {Number(ethers.utils.formatEther(betAmount || '0')).toFixed(3)} ETH</p>
+
+
               </div>
             )}
 
@@ -503,7 +535,7 @@ function CoinFlip() {
                 <div className='button-wrapper'>
                   <button className='game-button' onClick={handleClaimAndReset}>Claim Rewards</button>
                   <a
-                    href={generateTweetURL(((betAmount / 1e18).toFixed(2)) * 2, (betAmount / 1e18).toFixed(2), getChoiceString(selectedOption))}
+                    href={generateTweetURL(((betAmount / 1e18).toFixed(3)) * 2, (betAmount / 1e18).toFixed(2), getChoiceString(selectedOption))}
                     target="_blank"
                     rel="noopener noreferrer"
                     className='twitter-share-button tweet-button'>
@@ -519,9 +551,9 @@ function CoinFlip() {
                 {isWhitelisted ? (
                 <p className='lose'>Nothing</p>
                 ) : (
-                  <p className='lose confirmation'>{(betAmount / 1e18).toFixed(2)} ETH</p>
+                  <p className='lose confirmation'>{(betAmount / 1e18).toFixed(3)} ETH</p>
                 )}
-                <button onClick={handleTryAgain} className='try-again-button'>TRY AGAIN</button>
+                <button onClick={handleTryAgain} className='game-button '>TRY AGAIN</button>
               </div>
             )}
           </div>

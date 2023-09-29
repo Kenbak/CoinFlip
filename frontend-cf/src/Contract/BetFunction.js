@@ -22,28 +22,24 @@ export async function checkNetwork() {
 
 
 
-export async function placeBet(choice, isUserWhitelisted) {
+export async function placeBet(choice, isUserWhitelisted, amount) {
   try {
-  const contract = await getContractToWrite(VITE_COINFLIP_ADDRESS, CoinFlipABI);
+    const contract = await getContractToWrite(VITE_COINFLIP_ADDRESS, CoinFlipABI);
 
-  const betAmount = ethers.utils.parseEther("0.01"); // Example bet amount
-  const houseEdge = betAmount.mul(houseEdgePercentage).div(10000);
-  const totalAmount = betAmount.add(houseEdge);
+    const betAmount = ethers.utils.parseEther(amount.toString()); // Convert amount to BigNum
+    const houseEdge = betAmount.mul(houseEdgePercentage).div(10000);
+    const totalAmount = betAmount.add(houseEdge);
 
-  const valueToSend = isUserWhitelisted ? houseEdge : totalAmount;
+    const valueToSend = isUserWhitelisted ? houseEdge : totalAmount;
 
-  const tx = await contract.placeBet(choice, betAmount, { value: valueToSend });
-  await tx.wait();
-} catch (error) {
-  console.error("Error placing bet in BetFunction:", error);
-  throw error;
-
-    // Check if the error message contains the specific contract revert reason
-
-    // console.log(error.error.data.message)
-    // alert(error.error.data.message);
+    const tx = await contract.placeBet(choice, betAmount, { value: valueToSend });
+    await tx.wait();
+  } catch (error) {
+    console.error("Error placing bet in BetFunction:", error);
+    throw error;
   }
 }
+
 
 
 export async function isUserWhitelisted(address) {

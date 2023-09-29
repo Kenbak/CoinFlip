@@ -28,7 +28,7 @@ function Navbar() {
           {isError && <p>Error fetching balance</p>}
           {data && (
             <>
-              <p>{parseFloat(data.formatted).toFixed(2)} {data.symbol}</p>
+              <p>{parseFloat(data.formatted).toFixed(4)} {data.symbol}</p>
               <p id="none">|</p>
               <p>{truncateAddress(address)}</p>
             </>
