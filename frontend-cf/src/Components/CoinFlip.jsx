@@ -88,10 +88,18 @@ function CoinFlip() {
     }, [activeTab]);
 
     useEffect(() => {
-        if (address) {
-            isUserWhitelisted(address).then(setIsWhitelisted);
-        }
-    }, [address]);
+      if (address) {
+          isUserWhitelisted(address).then(status => {
+              setIsWhitelisted(status);
+              if (status) {
+                  const whitelistedBetAmount = ethers.utils.parseEther('0.005');
+                  setSelectedBet(whitelistedBetAmount);
+                  setBetAmount(whitelistedBetAmount);
+              }
+          });
+      }
+  }, [address]);
+
 
 
 
@@ -427,7 +435,7 @@ const selectBetAmount = (amount) => {
               Ethereum Address:
               {address}
             </label> */}
-            <div className='game-infos'>
+            <div className='game-infos' style={{ width: isWhitelisted ? '300px' : '375px' }}>
 
               {isWhitelisted && (<h1 className='wl-title'>Whitelist Flip</h1>)}
               <div className='options'>
@@ -453,7 +461,9 @@ const selectBetAmount = (amount) => {
               <div className='options'>
                 <label>FOR</label>
                 {isWhitelisted ? (
-                  <div  className={`option-wl ${selectedBet === 0.01e18 ? "selected" : ""}`} onClick={() => selectBetAmount(0.005)}>Offered</div>
+                   <div className='option-wl bet selected'>
+                   Offered (0.005 ETH)
+                  </div>
                 ) : (
                 <div className='inputs' id="bets">
                   <button type="button"
