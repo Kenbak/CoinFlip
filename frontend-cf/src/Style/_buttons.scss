@@ -1,7 +1,9 @@
 #start-game{
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   border-radius: 4px;
+  width: 100%;
 }
+
 
 #red{
   background-color: rgb(210, 10, 10);
@@ -16,7 +18,7 @@
   background-color: $yellow;
   color: $orange;
   border: none;
-  padding: 10px 10px;
+  padding: 10px 15px;
   border-radius: 50px;
   font-size: 1.1rem;
   cursor: pointer;
@@ -137,4 +139,11 @@
     transform: scale(0.95);
     background-color: darken($color: #4CAF50, $amount: 15);
   }
+}
+
+
+.choice{
+  padding: 10px 0px;
+  font-weight: 500;
+
 }

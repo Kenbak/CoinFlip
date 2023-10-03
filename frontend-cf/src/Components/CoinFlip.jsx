@@ -434,14 +434,16 @@ const selectBetAmount = (amount) => {
                 <label>I PICK...</label>
                 <div className='inputs'>
                 <div
-                  className={`option ${selectedOption === 0 ? "selected" : ""}`}
+                  className={`option choice ${selectedOption === 0 ? "selected" : ""}`}
                   onClick={() => handleOptionChange(0)} // 0 for Heads
+
                 >
                   Heads
                 </div>
                 <div
-                  className={`option ${selectedOption === 1 ? "selected" : ""}`}
+                  className={`option choice ${selectedOption === 1 ? "selected" : ""}`}
                   onClick={() => handleOptionChange(1)} // 1 for Tails
+
                 >
                   Tails
                 </div>
@@ -451,9 +453,9 @@ const selectBetAmount = (amount) => {
               <div className='options'>
                 <label>FOR</label>
                 {isWhitelisted ? (
-                  <div  className={`option-wl ${selectedBet === 0.01e18 ? "selected" : ""}`} onClick={selectBetAmount}>Offered</div>
+                  <div  className={`option-wl ${selectedBet === 0.01e18 ? "selected" : ""}`} onClick={() => selectBetAmount(0.005)}>Offered</div>
                 ) : (
-                <div className='inputs'>
+                <div className='inputs' id="bets">
                   <button type="button"
                     className={`option bet ${selectedBet?.toString() === ethers.utils.parseEther('0.005').toString() ? "selected" : ""}`}
                     onClick={() => selectBetAmount(0.005)}>
@@ -463,6 +465,11 @@ const selectBetAmount = (amount) => {
                     className={`option bet ${selectedBet?.toString() === ethers.utils.parseEther('0.01').toString() ? "selected" : ""}`}
                     onClick={() => selectBetAmount(0.01)}>
                     0.01 ETH
+                  </button>
+                  <button type="button"
+                    className={`option bet ${selectedBet?.toString() === ethers.utils.parseEther('0.025').toString() ? "selected" : ""}`}
+                    onClick={() => selectBetAmount(0.025)}>
+                    0.025 ETH
                   </button>
 
 
@@ -530,7 +537,7 @@ const selectBetAmount = (amount) => {
               <div className='result-info'>
                 <p className='confirmation'>Congratulations! 🎊</p>
                 <p className='mb-0 confirmation'>YOU WON</p>
-                <p className='win confirmation'>{(betAmount / 1e18).toFixed(2)} ETH</p>
+                <p className='win confirmation'>{(betAmount / 1e18).toFixed(3)} ETH</p>
 
                 <div className='button-wrapper'>
                   <button className='game-button' onClick={handleClaimAndReset}>Claim Rewards</button>
