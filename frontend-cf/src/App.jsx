@@ -14,6 +14,9 @@ import { configureChains, createConfig, WagmiConfig} from "wagmi";
 import { zkSync, zkSyncTestnet } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import FullLeaderboard from './Pages/FullLeaderboard';
+
 
 import { getAccount } from '@wagmi/core';
 
@@ -84,10 +87,18 @@ function App() {
      <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={chains} theme={myCustomTheme}>
 
-          <header className="App-header">
-          <Navbar  userAddress={userAddress} setUserAddress={setUserAddress}/>
-          <CoinFlip userAddress={userAddress} setUserAddress={setUserAddress} />
-          </header>
+      <Router>
+            <header className="App-header">
+              <Navbar  userAddress={userAddress} setUserAddress={setUserAddress} />
+
+              {/* Define your routes here */}
+              <Routes>
+
+              <Route path="/" element={<CoinFlip userAddress={userAddress} setUserAddress={setUserAddress} />} />
+                <Route path="/full-leaderboard" element={<FullLeaderboard />} />
+              </Routes>
+            </header>
+        </Router>
 
       </RainbowKitProvider>
     </WagmiConfig>

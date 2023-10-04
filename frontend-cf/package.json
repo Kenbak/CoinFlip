@@ -21,6 +21,7 @@
     "react": "^18.2.0",
     "react-confetti": "^6.1.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.16.0",
     "react-toastify": "^9.1.3",
     "typeface-bree-serif": "^1.1.13",
     "viem": "^1.9.5",

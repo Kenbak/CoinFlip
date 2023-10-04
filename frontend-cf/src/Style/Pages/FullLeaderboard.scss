@@ -1,0 +1,120 @@
+.full-leaderboard {
+  background: white;
+  padding:20px;  // Increased padding
+  border: 2px solid;  // Soften the border color
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1.5rem;
+}
+
+.container-leaderboard{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+
+
+.leaderboard-table tr:hover {
+  background-color: #f9f9f9;  // subtle hover effect
+}
+
+@keyframes flameFlicker {
+  0% { transform: scale(1); opacity: 0.9; }
+  20% { transform: scale(1.05); opacity: 0.95; }
+  40% { transform: scale(1); opacity: 0.9; }
+  60% { transform: scale(1.03); opacity: 0.92; }
+  80% { transform: scale(1.01); opacity: 0.94; }
+  100% { transform: scale(1); opacity: 0.9; }
+}
+
+.fire-wrapper{
+  display: flex;
+  justify-content: center;
+}
+
+.fire-emoji {
+  font-size: 1rem;
+  margin-left: 0.5rem;
+  animation: flameFlicker 1s infinite;  /* Apply the animation */
+}
+
+.leaderboard-table tr:nth-child(odd) {
+  background-color: #f7f7f7;  // zebra striping
+}
+
+.leaderboard-table td.score {
+  font-weight: bold;
+  color: #FF8B02;
+  background-color: #FFF3E0;
+}
+
+.rank-container {
+  display: flex;
+  align-items: center;
+}
+
+.badge-icon {
+  margin-left: 5px;  // Space out the badge from the rank number
+}
+
+
+
+
+.leaderboard-table th.active-sort {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.leaderboard-table th {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.leaderboard-table th:hover {
+  background-color: #f0f0f0;
+}
+
+.sort-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  text-align: center;
+  vertical-align: inherit;
+  font-size: 0.5rem;
+}
+
+// /* Highlight the top 3 players */
+// .leaderboard-table tbody tr:nth-child(-n+3) {
+//   background-color: #eaf8ea;  // light green shade
+// }
+
+
+@media screen and (max-width: 920px) {  /* Adjust based on your needs. 768px is a common breakpoint for tablets. */
+
+  .full-leaderboard {
+    padding: 10px;  /* Reduce padding */
+  }
+
+  .leaderboard-table {
+    overflow-x: auto;  /* Makes the table horizontally scrollable */
+    display: block;  /* Convert table to block for scrolling */
+  }
+
+  /* You might want to decrease font sizes for smaller screens for better visibility */
+  .leaderboard-table th,
+  .leaderboard-table td {
+    font-size: 0.8em;
+    padding: 8px;  /* Adjusted padding */
+  }
+
+  .fire-emoji {
+    font-size: 0.8rem;
+    margin-left: 0.3rem;
+  }
+
+  /* Any other adjustments you'd like to make for smaller screens */
+}

@@ -45,7 +45,7 @@ function FAQModal({ isOpen, handleClose }) {
       Absolutely! zkFlip operates entirely on-chain. Even if the website faces downtime, you can still place your bets directly via the contract. This ensures uninterrupted gameplay and complete transparency.
 
       <h4 className='mb-0'>Where can I learn more or get support?</h4>
-      Follow us on Twitter! We will assist and answer any further questions you might have.
+      Follow us on Twitter or join us in our <a  target='_blank' rel="noreferrer" href="https://discord.gg/7DbEzT9N">discord</a>. We will assist and answer any further questions you might have.
 
 
   </>

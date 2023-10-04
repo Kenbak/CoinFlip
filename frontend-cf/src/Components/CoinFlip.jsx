@@ -81,7 +81,7 @@ function CoinFlip() {
 
     useEffect(() => {
         if (activeTab === 'leaderboard') {
-            fetchData(`${BASE_API_URL}/leaderboard`, setLeaderboard);
+            fetchData(`${BASE_API_URL}/simple_leaderboard`, setLeaderboard);
         } else if (activeTab === 'latestFlips') {
             fetchData(`${BASE_API_URL}`, setGameHistory);
         }
@@ -149,7 +149,7 @@ const selectBetAmount = (amount) => {
 
   const handleTryAgain = () => {
     resetGame();
-    fetchData(`${BASE_API_URL}/leaderboard`, setLeaderboard);
+    fetchData(`${BASE_API_URL}/simple_leaderboard`, setLeaderboard);
   };
 
 
@@ -351,7 +351,7 @@ const selectBetAmount = (amount) => {
         toast.success('Reward Claimed!', {
           position: toast.POSITION.BOTTOM_RIGHT
       });
-      fetchData(`${BASE_API_URL}/leaderboard`, setLeaderboard);
+      fetchData(`${BASE_API_URL}/simple_leaderboard`, setLeaderboard);
     } catch (error) {
 
         toast.error(error.error.data.message, {
@@ -400,9 +400,14 @@ const selectBetAmount = (amount) => {
         </div>
 
 
-        <a href="https://twitter.com/zk_flip" rel="noreferrer" target='_blank' className='modal-link social'>
+        <div className='social'>
+            <a href="https://twitter.com/zk_flip" rel="noreferrer" target='_blank' className='modal-link '>
             <FontAwesomeIcon icon={faTwitter} />
-        </a>
+            </a>
+            <a href="https://discord.gg/wPZZRpE5Uj" rel="noreferrer" target='_blank' className='modal-link'>
+            <FontAwesomeIcon icon={faDiscord} />
+            </a>
+          </div>
 
 
         <GameHistory
