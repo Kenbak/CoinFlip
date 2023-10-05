@@ -486,6 +486,21 @@ const selectBetAmount = (amount) => {
                     onClick={() => selectBetAmount(0.025)}>
                     0.025 ETH
                   </button>
+                  {/* <button type="button"
+                    className={`option bet ${selectedBet?.toString() === ethers.utils.parseEther('0.025').toString() ? "selected" : ""}`}
+                    onClick={() => selectBetAmount(0.025)}>
+                    0.05 ETH
+                  </button>
+                  <button type="button"
+                    className={`option bet ${selectedBet?.toString() === ethers.utils.parseEther('0.025').toString() ? "selected" : ""}`}
+                    onClick={() => selectBetAmount(0.025)}>
+                    0.1 ETH
+                  </button>
+                  <button type="button"
+                    className={`option bet ${selectedBet?.toString() === ethers.utils.parseEther('0.025').toString() ? "selected" : ""}`}
+                    onClick={() => selectBetAmount(0.025)}>
+                    0.2 ETH
+                  </button> */}
 
 
 

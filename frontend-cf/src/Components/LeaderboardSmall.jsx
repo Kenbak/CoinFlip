@@ -48,7 +48,7 @@ function Leaderboard({ leaderboard }) {
                   ))}
         </tbody>
       </table>
-        <Link to="/full-leaderboard" className='modal-link'>View Full Leaderboard</Link>
+        <Link to="/leaderboard" className='modal-link'>View Full Leaderboard</Link>
     </div>
   );
 }

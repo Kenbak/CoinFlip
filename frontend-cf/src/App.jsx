@@ -95,7 +95,7 @@ function App() {
               <Routes>
 
               <Route path="/" element={<CoinFlip userAddress={userAddress} setUserAddress={setUserAddress} />} />
-                <Route path="/full-leaderboard" element={<FullLeaderboard />} />
+                <Route path="/leaderboard" element={<FullLeaderboard />} />
               </Routes>
             </header>
         </Router>
