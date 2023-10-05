@@ -16,16 +16,30 @@ const BASE_API_URL = import.meta.env.DEV
 ? import.meta.env.VITE_REACT_APP_DEVELOPMENT_URL
 : import.meta.env.VITE_REACT_APP_PRODUCTION_URL;
 
-// Outside of your component function
-function getScoreRank(leaderboard, address) {
-  const sortedByScore = [...leaderboard].sort((a, b) => parseFloat(b[1].score) - parseFloat(a[1].score));
-  for (let i = 0; i < sortedByScore.length; i++) {
-    if (sortedByScore[i][0] === address) {
-      return i;
-    }
+
+function generateRanks(leaderboard) {
+  if (!leaderboard || leaderboard.length === 0) {
+      return {};
   }
-  return -1;  // in case address is not found
+
+  const sortedByScore = [...leaderboard].sort((a, b) => parseFloat(b[1].score) - parseFloat(a[1].score));
+
+  let rank = 0;
+  let previousScore = -1; // Assign a value that's unlikely to match any real score
+  const rankMap = {};
+
+  for (let i = 0; i < sortedByScore.length; i++) {
+      if (sortedByScore[i][1].score !== previousScore) {
+          rank++; // Increment rank if score is different from previous
+      }
+      rankMap[sortedByScore[i][0]] = rank;  // Store rank by address
+      previousScore = sortedByScore[i][1].score;  // Update previous score for next iteration
+  }
+
+  return rankMap;
 }
+
+
 
 
 
@@ -54,28 +68,32 @@ function FullLeaderboard() {
       }
     });
 
+    const rankMap = generateRanks(leaderboard);
+
+
     function renderBadge(rank) {
       switch(rank) {
-        case 0:
+        case 1:  // Updated case
           return <img src={goldBadge} alt="Gold Badge" className="badge-icon" />;
-        case 1:
+        case 2:  // Updated case
           return <img src={silverBadge} alt="Silver Badge" className="badge-icon" />;
-        case 2:
+        case 3:  // Updated case
           return <img src={bronzeBadge} alt="Bronze Badge" className="badge-icon" />;
-        case 3:
         case 4:
-          return <img src={platinumBadge} alt="Platinum Badge" className="badge-icon" />;
         case 5:
+          return <img src={platinumBadge} alt="Platinum Badge" className="badge-icon" />;
         case 6:
-          return <img src={emeraldBadge} alt="Emerald Badge" className="badge-icon" />;
         case 7:
+          return <img src={emeraldBadge} alt="Emerald Badge" className="badge-icon" />;
         case 8:
         case 9:
+        case 10:  // Updated case
           return <img src={saphirBadge} alt="Sapphire Badge" className="badge-icon" />;
         default:
           return null;
       }
     }
+
 
 
 
@@ -175,13 +193,14 @@ function FullLeaderboard() {
         </thead>
         <tbody>
           {sortedLeaderboard.map((entry, index) => {
-            const rank = getScoreRank(leaderboard, entry[0]);
+            const rank = rankMap[entry[0]];
+
 
             return (
             <tr key={index}>
                <td>
               <div className="rank-container">
-              {rank + 1}
+              {rank}
              {renderBadge(rank)}
               </div>
             </td>
