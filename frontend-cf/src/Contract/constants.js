@@ -11,7 +11,7 @@
 
 
 
-for mainnet
+// for mainnet
 
 export const VITE_COINFLIP_ADDRESS = "0xCB97fE415f0aB3A6AD60214255F8087BF046B893"
 
