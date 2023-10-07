@@ -48,6 +48,10 @@ function FullLeaderboard() {
   const [sortColumn, setSortColumn] = useState('score'); // default sort by score
   const [sortDirection, setSortDirection] = useState('desc'); // default direction is descending
   const [activeColumn, setActiveColumn] = useState('score');
+  const [totalPlayers, setTotalPlayers] = useState(0);
+  const [totalPayout, setTotalPayout] = useState(0);
+
+
 
 
     const sortedLeaderboard = [...leaderboard].sort((a, b) => {
@@ -147,6 +151,16 @@ function FullLeaderboard() {
       .then(response => response.json())
       .then(data => setLeaderboard(data))
       .catch(error => console.error('Error fetching leaderboard:', error));
+
+      fetch(`${BASE_API_URL}/total_stats`)
+      .then(response => response.json())
+      .then(data => {
+        console.log("Total Stats Data:", data);
+        // Continue logging for clarity
+        setTotalPlayers(data.total_players);  // Note: Using the exact key from the data
+        setTotalPayout(parseFloat(data.total_payout));
+      })
+      .catch(error => console.error('Error fetching total stats:', error));
   }, []);
 
   return (
@@ -155,6 +169,11 @@ function FullLeaderboard() {
 
     <div className="full-leaderboard">
       <h2>Leaderboard</h2>
+      <p className="stats-subtitle">
+      Players: {totalPlayers} | Paid Out: {totalPayout.toFixed(2)} ETH
+      </p>
+
+
       <table className="leaderboard-table leaderboard-specific">
         <thead>
         <tr>
