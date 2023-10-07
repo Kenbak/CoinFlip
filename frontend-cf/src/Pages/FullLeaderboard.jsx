@@ -155,7 +155,7 @@ function FullLeaderboard() {
 
     <div className="full-leaderboard">
       <h2>Leaderboard</h2>
-      <table className="leaderboard-table">
+      <table className="leaderboard-table leaderboard-specific">
         <thead>
         <tr>
           <th onClick={() => handleHeaderClick('rank')} className={sortColumn === 'rank' ? 'active-sort' : ''}>
@@ -163,6 +163,9 @@ function FullLeaderboard() {
           </th>
           <th onClick={() => handleHeaderClick('address')} className={sortColumn === 'address' ? 'active-sort' : ''}>
               Address {renderSortIndicator('address')}
+          </th>
+          <th onClick={() => handleHeaderClick('score')} className={sortColumn === 'score' ? 'active-sort' : ''}>
+              Score {renderSortIndicator('score')}
           </th>
           <th onClick={() => handleHeaderClick('games_played')} className={sortColumn === 'games_played' ? 'active-sort' : ''}>
               Games Played {renderSortIndicator('games_played')}
@@ -185,9 +188,7 @@ function FullLeaderboard() {
           <th onClick={() => handleHeaderClick('average_payout')} className={sortColumn === 'average_payout' ? 'active-sort' : ''}>
               Avg. Payout {renderSortIndicator('average_payout')}
           </th>
-          <th onClick={() => handleHeaderClick('score')} className={sortColumn === 'score' ? 'active-sort' : ''}>
-              Score {renderSortIndicator('score')}
-          </th>
+
       </tr>
 
         </thead>
@@ -205,9 +206,11 @@ function FullLeaderboard() {
               </div>
             </td>
               <td>{truncateAddress(entry[0])}</td>
+              <td className="score">{entry[1].score}</td>
+
               <td>{entry[1].games_played}</td>
               <td>{entry[1].total_won}</td>
-              <td style={{ color: entry[1].win_rate > 50 ? 'green' : 'red' }}>
+              <td>
                 {entry[1].win_rate}%
               </td>
               <td>
@@ -223,7 +226,6 @@ function FullLeaderboard() {
               <td>{weiToEth(entry[1].total_bet)} ETH</td>
               <td>{entry[1].total_payout} ETH</td>
               <td>{entry[1].average_payout} ETH</td>
-              <td className="score">{entry[1].score}</td>
 
             </tr>
             )

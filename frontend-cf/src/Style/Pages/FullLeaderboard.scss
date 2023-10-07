@@ -18,7 +18,7 @@
 
 
 
-.leaderboard-table tr:hover {
+.leaderboard-specific tr:hover {
   background-color: #f9f9f9;  // subtle hover effect
 }
 
@@ -42,11 +42,11 @@
   animation: flameFlicker 1s infinite;  /* Apply the animation */
 }
 
-.leaderboard-table tr:nth-child(odd) {
+.leaderboard-specific tr:nth-child(odd) {
   background-color: #f7f7f7;  // zebra striping
 }
 
-.leaderboard-table td.score {
+.leaderboard-specific td.score {
   font-weight: bold;
   color: #FF8B02;
   background-color: #FFF3E0;
@@ -64,17 +64,17 @@
 
 
 
-.leaderboard-table th.active-sort {
+.leaderboard-specific th.active-sort {
   background-color: #f5f5f5;
   cursor: pointer;
 }
 
-.leaderboard-table th {
+.leaderboard-specific th {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.leaderboard-table th:hover {
+.leaderboard-specific th:hover {
   background-color: #f0f0f0;
 }
 
@@ -88,7 +88,7 @@
 }
 
 // /* Highlight the top 3 players */
-// .leaderboard-table tbody tr:nth-child(-n+3) {
+// .leaderboard-specific tbody tr:nth-child(-n+3) {
 //   background-color: #eaf8ea;  // light green shade
 // }
 
@@ -99,14 +99,14 @@
     padding: 10px;  /* Reduce padding */
   }
 
-  .leaderboard-table {
+  .leaderboard-specific {
     overflow-x: auto;  /* Makes the table horizontally scrollable */
     display: block;  /* Convert table to block for scrolling */
   }
 
   /* You might want to decrease font sizes for smaller screens for better visibility */
-  .leaderboard-table th,
-  .leaderboard-table td {
+  .leaderboard-specific th,
+  .leaderboard-specific td {
     font-size: 0.8em;
     padding: 8px;  /* Adjusted padding */
   }
