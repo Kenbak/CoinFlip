@@ -141,7 +141,7 @@ function FullLeaderboard() {
 
 
   function weiToEth(weiValue) {
-    return (weiValue / 10**18).toFixed(2);  // You can adjust the number of decimal places as needed
+    return (weiValue / 10**18).toFixed(3);  // You can adjust the number of decimal places as needed
   }
 
 

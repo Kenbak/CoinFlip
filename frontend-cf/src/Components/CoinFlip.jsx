@@ -87,18 +87,7 @@ function CoinFlip() {
         }
     }, [activeTab]);
 
-    useEffect(() => {
-      if (address) {
-          isUserWhitelisted(address).then(status => {
-              setIsWhitelisted(status);
-              if (status) {
-                  const whitelistedBetAmount = ethers.utils.parseEther('0.005');
-                  setSelectedBet(whitelistedBetAmount);
-                  setBetAmount(whitelistedBetAmount);
-              }
-          });
-      }
-  }, [address]);
+
 
 
 
@@ -156,16 +145,40 @@ const selectBetAmount = (amount) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowGameHistory(false);
+    console.log("is Whitelisted:",isWhitelisted)
 
-    if (selectedOption === null || betAmount === null) {
-        resetGame();
+    if (isWhitelisted) {
+      if (selectedOption === null) {
+          toast.warn("Please choose Heads or Tails!", {
+              position: toast.POSITION.BOTTOM_RIGHT,
+              autoClose: true
+          })
+          return;
+      }
+  } else {
+      if (selectedOption === null && betAmount === null) {
+          resetGame();
+          toast.warn("Please select the bet amount and choose Heads or Tails!", {
+              position: toast.POSITION.BOTTOM_RIGHT,
+              autoClose: true
+          })
+          return;
+      } else if (selectedOption === null) {
+          toast.warn("Please choose Heads or Tails!", {
+              position: toast.POSITION.BOTTOM_RIGHT,
+              autoClose: true
+          })
+          return;
+      } else if (betAmount === null) {
+          toast.warn("Please select the bet amount!", {
+              position: toast.POSITION.BOTTOM_RIGHT,
+              autoClose: true
+          })
+          return;
+      }
+  }
 
-        toast.warn("Please select the bet amount and choose Heads or Tails!", {
-          position: toast.POSITION.BOTTOM_RIGHT,
-          autoClose: true
-        })
-        return;
-    }
+
 
     try {
         setLoading(true);
@@ -180,6 +193,8 @@ const selectBetAmount = (amount) => {
 
         }
         const userIsWhitelisted = await isUserWhitelisted(address);
+        console.log("Selected Bet Value Before Place Bet:", selectedBet?.toString());
+
 
       try{
         await placeBet(selectedOption, userIsWhitelisted, ethers.utils.formatEther(selectedBet));
@@ -187,7 +202,7 @@ const selectBetAmount = (amount) => {
           position: toast.POSITION.BOTTOM_RIGHT})
 
         } catch (error) {
-
+          
         resetGame()
         console.error("Error placing bet in CoinFlip Front:", error);
         // alert(error.error.data.message);
@@ -326,11 +341,18 @@ const selectBetAmount = (amount) => {
   console.log('Selected Bet:', selectedBet?.toString());
 
   useEffect(() => {
-    // Define a function to fetch the whitelisting status
     const fetchWhitelistStatus = async () => {
         if (address) {
             const status = await isUserWhitelisted(address);
             setIsWhitelisted(status);
+
+            // Set the bet amount for whitelisted users immediately after fetching the status
+            if (status) {
+                const whitelistedBetAmount = ethers.utils.parseEther('0.005');
+                setSelectedBet(whitelistedBetAmount);
+                setBetAmount(whitelistedBetAmount);
+                console.log("Whitelisted User Detected: Setting Bet Amount", whitelistedBetAmount.toString());
+            }
         }
     };
 
@@ -342,7 +364,7 @@ const selectBetAmount = (amount) => {
 
     // Clear the interval when the component unmounts
     return () => clearInterval(intervalId);
-  }, [address]);
+}, [address]);
 
   const handleClaimAndReset = async () => {
     try {
