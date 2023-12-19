@@ -11,12 +11,18 @@ const houseEdgePercentage = 500; // Represents 5% (as basis points)
 
 export async function checkNetwork() {
   try {
-    if (window.ethereum.networkVersion != VITE_NETWORK_ID) {
+
+
+    // Request the network ID using the EIP-1193 compliant method
+    const networkId = await window.ethereum.request({ method: 'net_version' });
+    console.log("NETWORK:", networkId)
+
+    if (networkId != VITE_NETWORK_ID) {
       throw "Wrong network";
     }
   } catch (error) {
     console.error("Network check error:", error);
-    throw error
+    throw error;
   }
 }
 
