@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-
+import { Tooltip } from 'react-tooltip'
 import axios from 'axios';
 import "../Style/Components/Coinflip.scss";
 import logo from "../assets/images/zkflogo.png"
+
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect  } from 'wagmi';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,7 +13,8 @@ import {
   placeBet,
   isUserWhitelisted,
   claimReward,
-  getResult
+  getResult,
+  getCurrentBet
 } from "../Contract/BetFunction";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTwitter, faDiscord } from '@fortawesome/free-brands-svg-icons';
@@ -59,6 +61,7 @@ function CoinFlip() {
   const handleClose = () => setOpen(false);
   const handleOpenFaq = () => setOpenFaq(true);
   const handleCloseFaq = () => setOpenFaq(false);
+   const [hasClaimed, setHasClaimed] = useState(false);
 
   const toastConfig = {
     position: toast.POSITION.BOTTOM_RIGHT,
@@ -87,6 +90,22 @@ function CoinFlip() {
         }
     }, [activeTab]);
 
+
+
+    const checkClaimStatus = async () => {
+      if (address) {
+        try {
+          const currentBet = await getCurrentBet(address);
+          setHasClaimed(currentBet.claimed);
+        } catch (error) {
+          console.error('Error checking claim status:', error);
+        }
+      }
+    };
+
+    useEffect(() => {
+      checkClaimStatus();
+    }, [address]);
 
 
 
@@ -119,6 +138,7 @@ function CoinFlip() {
     setLoadingStage(null);
     setIsWhitelisted(false);
     setShowGameHistory(true);
+    setHasClaimed(false);
 };
 
 
@@ -202,7 +222,7 @@ const selectBetAmount = (amount) => {
           position: toast.POSITION.BOTTOM_RIGHT})
 
         } catch (error) {
-          
+
         resetGame()
         console.error("Error placing bet in CoinFlip Front:", error);
         // alert(error.error.data.message);
@@ -369,7 +389,7 @@ const selectBetAmount = (amount) => {
   const handleClaimAndReset = async () => {
     try {
         await claimReward(); // Call the claimReward function from BetFunctions
-
+        await checkClaimStatus();
         toast.success('Reward Claimed!', {
           position: toast.POSITION.BOTTOM_RIGHT
       });
@@ -588,11 +608,13 @@ const selectBetAmount = (amount) => {
             {result.outcome ? (
               <div className='result-info'>
                 <p className='confirmation'>Congratulations! 🎊</p>
+               
                 <p className='mb-0 confirmation'>YOU WON</p>
                 <p className='win confirmation'>{(betAmount / 1e18).toFixed(3)} ETH</p>
 
+
                 <div className='button-wrapper'>
-                  <button className='game-button' onClick={handleClaimAndReset}>Claim Rewards</button>
+                  <button className='game-button' onClick={handleClaimAndReset} disabled={hasClaimed}>{hasClaimed ? 'Reward Claimed' : 'Claim Reward'}</button>
                   <a
                     href={generateTweetURL(((betAmount / 1e18).toFixed(3)) * 2, (betAmount / 1e18).toFixed(2), getChoiceString(selectedOption))}
                     target="_blank"
@@ -600,7 +622,19 @@ const selectBetAmount = (amount) => {
                     className='twitter-share-button tweet-button'>
                       Tweet Your Win!
                   </a>
-                  <button className="try-again-button" onClick={handleTryAgain}>Play Again</button>
+                  <Tooltip id="claimTooltip" place="top" effect="solid" />
+                  <button
+                  className="try-again-button"
+                  onClick={handleTryAgain}
+                  disabled={!hasClaimed}
+                  data-tooltip-content={!hasClaimed ? "Please claim your reward before playing again." : ""}
+                  data-tooltip-id="playAgainTooltip"
+                  >
+                    Play Again
+                  </button>
+                  {!hasClaimed && (
+                    <Tooltip id="playAgainTooltip" place="top" type="dark" effect="solid" />
+                  )}
                 </div>
               </div>
             ) : (

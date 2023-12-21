@@ -32,6 +32,13 @@
     background-color: darken($color: $yellow, $amount: 10); // A slightly different shade of purple for hover effect
     transform: scale(1.05);
   }
+  &:disabled {
+    background-color: lighten($color: $yellow, $amount: 10); // Lighter shade of yellow for disabled state
+    color: darken($color: $orange, $amount: 5); // Darker shade of orange for text
+    cursor: not-allowed;
+    opacity: 0.7; // Optionally make the button look faded
+    text-shadow: none;
+  }
 }
 
 
@@ -41,53 +48,6 @@
   background-color: darken($color: $yellow, $amount: 15); // Makes the button a bit darker when pressed
 }
 
-
-// .tweet-button {
-//   display: inline-block; // Ensuring it acts like a button when styled
-//   background-color: #1DA1F2; // Twitter's signature blue color
-//   color: white; // Text color for better contrast against the blue
-//   border: none;
-//   padding: 10px 15px; // A bit more horizontal padding for the longer text
-//   border-radius: 4px;
-//   font-size: 1.1rem;
-//   cursor: pointer;
-//   font-weight: bold;
-//   font-family: 'Bree Serif', serif;
-//   //text-shadow: 1px 1px beige;
-//   transition: transform 0.2s ease, background-color 0.2s ease;
-//   transform: scale(1);
-//   text-decoration: none; // Remove underline which is default for <a> tags
-
-//   &:hover {
-//     background-color: darken($color: #1DA1F2, $amount: 10); // Darker shade of Twitter blue for hover
-//     transform: scale(1.05);
-//     color: white; // Ensure the text color remains white on hover
-//   }
-
-//   &:active {
-//     transform: scale(0.95);
-//     background-color: darken($color: #1DA1F2, $amount: 15); // Even darker shade for active state
-//   }
-// }
-
-// .try-again-button{
-//   background-color: $text-light;
-//   color: white;
-//   border: none;
-//   padding: 10px 10px;
-//   border-radius: 4px;
-//   font-size: 1.1rem;
-//   cursor: pointer;
-//   font-family: 'Bree Serif', serif;
-//   font-weight: bold;
-//   transition: transform 0.2s ease, background-color 0.2s ease;
-//   transform: scale(1);
-
-//   &:hover {
-//     background-color: darken($color: $text-light, $amount: 10); // A slightly different shade of purple for hover effect
-//     transform: scale(1.05);
-//   }
-// }
 
 
 .tweet-button {
@@ -138,6 +98,14 @@
   &:active {
     transform: scale(0.95);
     background-color: darken($color: #4CAF50, $amount: 15);
+  }
+
+  &:disabled {
+    background-color: lighten($color: #4CAF50, $amount: 5); // Lighter shade of yellow for disabled state
+    color: darken($color: white, $amount: 5); // Darker shade of orange for text
+    cursor: not-allowed;
+    opacity: 0.7; // Optionally make the button look faded
+    text-shadow: none;
   }
 }
 
