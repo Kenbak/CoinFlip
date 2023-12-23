@@ -198,15 +198,11 @@ function FullLeaderboard() {
           <th onClick={() => handleHeaderClick('win_streak')} className={sortColumn === 'win_streak' ? 'active-sort' : ''}>
               Win Streak {renderSortIndicator('win_streak')}
           </th>
-          <th onClick={() => handleHeaderClick('total_bet')} className={sortColumn === 'total_bet' ? 'active-sort' : ''}>
-              Total Bet (ETH) {renderSortIndicator('total_bet')}
-          </th>
+
           <th onClick={() => handleHeaderClick('total_payout')} className={sortColumn === 'total_payout' ? 'active-sort' : ''}>
               Total Payout {renderSortIndicator('total_payout')}
           </th>
-          <th onClick={() => handleHeaderClick('average_payout')} className={sortColumn === 'average_payout' ? 'active-sort' : ''}>
-              Avg. Payout {renderSortIndicator('average_payout')}
-          </th>
+
 
       </tr>
 
@@ -238,14 +234,7 @@ function FullLeaderboard() {
                   {entry[1].win_streak >= 4 ? <div className="fire-emoji">🔥</div> : ''}
                 </div>
             </td>
-
-
-
-
-              <td>{weiToEth(entry[1].total_bet)} ETH</td>
               <td>{entry[1].total_payout} ETH</td>
-              <td>{entry[1].average_payout} ETH</td>
-
             </tr>
             )
 })}

@@ -66,6 +66,21 @@
     "signature": "0x97ec642c"
   },
   {
+    "inputs": [],
+    "name": "NUM_BLOCKS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true,
+    "signature": "0xf33b811a"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -144,27 +159,6 @@
     "type": "function",
     "constant": true,
     "signature": "0x89a78f1a"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "blockNumbersToBeUsed",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x8398aefe"
   },
   {
     "inputs": [],

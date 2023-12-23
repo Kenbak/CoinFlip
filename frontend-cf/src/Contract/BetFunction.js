@@ -2,8 +2,8 @@
 
 import { ethers } from "ethers";
 import { getContractToWrite, getContractToRead, getProvider } from "./interact";
-// import CoinFlipABI from "./CoinFlipFix.abi.json"; // FOR TESTNET
-import CoinFlipABI from "./CoinFlip.abi.json"; // FOR MAINNET
+ // import CoinFlipABI from "./CoinFlipFix.abi.json"; // FOR TESTNET
+ import CoinFlipABI from "./CoinFlip.abi.json"; // FOR MAINNET
 import { VITE_NETWORK_ID, VITE_COINFLIP_ADDRESS  } from "./constants";
 
 const houseEdgePercentage = 500; // Represents 5% (as basis points)
